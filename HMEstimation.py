@@ -1,4 +1,4 @@
-import HM
+import HM.HM as HM
 
 class HMEstimation:
     def __init__(self):
