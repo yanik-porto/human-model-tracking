@@ -5,7 +5,11 @@ class HPCoco(HP):
     def __init__(self, image, skeleton):
         bbox = self.skeleton_to_bbox(skeleton)
         super(HPCoco, self).__init__(image, bbox)
-        self.skeleton = skeleton
+
+        # self.skeleton : list of x, y, score
+        self.skeleton = []
+        for i in range(skeleton.shape[0]):
+            self.skeleton.append(skeleton[i, :3])
 
     def skeleton_to_bbox(self, skeleton):
         left = np.amin(skeleton[:, 0], axis=0)
