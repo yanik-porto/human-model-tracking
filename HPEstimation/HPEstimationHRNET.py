@@ -93,9 +93,7 @@ class HPEstimationHRNET(HPEstimation):
 
         for idx, s in enumerate(sorted(self.scale_factor, reverse=True)):
             inputs = self.pre_process(image, s)
-            print(inputs.shape)
             outputs = self.model(inputs)
-            print("outputs: ", outputs[0].shape)
             final_heatmaps, tags_list = self.post_process(outputs, s, base_size, final_heatmaps, tags_list)
         
         final_heatmaps = final_heatmaps / float(len(self.cfg.TEST.SCALE_FACTOR))
