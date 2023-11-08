@@ -1,4 +1,5 @@
 from .HPEstimation import HPEstimation
+from HP.HPCoco import HPCoco
 from .HRNET.pose_higher_hrnet import get_pose_net
 from .HRNET.utils import resize_align_multi_scale, get_multi_stage_outputs, aggregate_results, get_multi_scale_size, get_final_preds
 from .HRNET.group import HeatmapParser
@@ -106,7 +107,10 @@ class HPEstimationHRNET(HPEstimation):
                 [final_heatmaps.size(3), final_heatmaps.size(2)]
             )
         
-        return final_results
+        dets = []
+        for skel in final_results:
+            dets.append(HPCoco(image, skel[:, :3]))
+        return dets
 
     def pre_process(self, image, scale):
         image_resized, center, scale = resize_align_multi_scale(

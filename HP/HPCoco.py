@@ -1,7 +1,15 @@
 from .HP import HP
+import numpy as np
 
 class HPCoco(HP):
     def __init__(self, image, skeleton):
         bbox = self.skeleton_to_bbox(skeleton)
         super(HPCoco, self).__init__(image, bbox)
         self.skeleton = skeleton
+
+    def skeleton_to_bbox(self, skeleton):
+        left = np.amin(skeleton[:, 0], axis=0)
+        right = np.amax(skeleton[:, 0], axis=0)
+        top = np.amin(skeleton[:, 1], axis=0)
+        bottom = np.amax(skeleton[:, 1], axis=0)
+        return (left, top, right - left, bottom - top)
