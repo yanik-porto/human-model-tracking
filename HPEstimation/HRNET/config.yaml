@@ -58,10 +58,12 @@ MODEL:
   TAG_PER_JOINT: True
 DATASET:
   INPUT_SIZE: 512
+  NUM_JOINTS: 17
+  MAX_NUM_PEOPLE: 30
 TEST:
-  FLIP_TEST: True
+  FLIP_TEST: False
   IMAGES_PER_GPU: 1
-  MODEL_FILE: '' 
+  MODEL_FILE: 'HPEstimation/HRNET/checkpoints/pose_higher_hrnet_w32_512.pth' 
   SCALE_FACTOR: [1]
   DETECTION_THRESHOLD: 0.1
   WITH_HEATMAPS: (True, True)
@@ -69,3 +71,6 @@ TEST:
   PROJECT2IMAGE: True
   NMS_KERNEL: 5
   NMS_PADDING: 2
+LOSS:
+  WITH_AE_LOSS: [True, False]
+  WITH_HEATMAPS_LOSS: [True, True]

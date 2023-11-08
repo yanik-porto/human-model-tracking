@@ -1,6 +1,6 @@
 import HM.HM as HM
 
-class HPEstimation:
+class HPEstimation(object):
     def __init__(self):
         pass
 
