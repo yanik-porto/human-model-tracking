@@ -3,3 +3,4 @@ class HP:
         self.image = image
         # bbox : left top width height
         self.bbox = bbox
+        self.viewpointId = self.image.viewpointId
