@@ -6,6 +6,7 @@ import sys
 import cv2
 
 from settings.config import load_config
+from SensorData.HImage import HImage
 from Pipeline.pipeline import Pipeline
 
 def parse_args():
@@ -44,11 +45,13 @@ if __name__ == "__main__":
         for vidpath in metaByVid:
             if idx < metaByVid[vidpath]['maxIdx']:
                 img = iio.imread(vidpath, index=idx)
-                images.append(img)
+                images.append(HImage(img, os.path.basename(vidpath)))
 
         if len(images) == 0:
             break
 
-        cv2.imshow("mywind", images[0])
-        cv2.waitKey(1000 // config.target_fps // config.sampling_by_sec)
+        pipeline.process(images)
+
+        # cv2.imshow("mywind", images[0])
+        # cv2.waitKey(1000 // config.target_fps // config.sampling_by_sec)
         idx += config.target_fps // config.sampling_by_sec

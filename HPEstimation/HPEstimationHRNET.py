@@ -79,12 +79,15 @@ class HPEstimationHRNET(HPEstimation):
         _C.freeze()
         return _C
 
-    def process(self, images):
-        # assert 1 == images.size(0), 'Test batch size should be 1'
-        # image = images[0].cpu().numpy()
-        assert 1 == len(images), 'Test batch size should be 1'
-        image = images[0]
+    def process(self, himages):
+        dets = []
+        for himage in himages:
+            dets.extend(self.process_image(himage))
+        return dets
 
+    
+    def process_image(self, himage):
+        image = himage.data
         base_size, center, scale = get_multi_scale_size(
             image, self.cfg.DATASET.INPUT_SIZE, 1.0, min(self.cfg.TEST.SCALE_FACTOR)
         )
@@ -109,7 +112,7 @@ class HPEstimationHRNET(HPEstimation):
         
         dets = []
         for skel in final_results:
-            dets.append(HPCoco(image, skel[:, :3]))
+            dets.append(HPCoco(himage, skel[:, :3]))
         return dets
 
     def pre_process(self, image, scale):

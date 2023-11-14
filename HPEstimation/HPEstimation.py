@@ -4,7 +4,7 @@ class HPEstimation(object):
     def __init__(self):
         pass
 
-    def process(self, image):
+    def process(self, himages):
         pass
 
     
