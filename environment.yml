@@ -99,8 +99,11 @@ dependencies:
   - zlib=1.2.13=h5eee18b_0
   - zstd=1.5.5=hc292b87_0
   - pip:
+      - imageio==2.32.0
+      - imageio-ffmpeg==0.4.9
       - munkres==1.1.4
       - opencv-python==4.8.1.78
+      - psutil==5.9.6
       - pyyaml==6.0.1
       - yacs==0.1.8
 prefix: /home/yanik/miniconda3/envs/hm

@@ -1,4 +1,4 @@
-from HPEstimationHRNET import HPEstimationHRNET
+from .HPEstimationHRNET import HPEstimationHRNET
 
 def Create(config):
     estimator = None
