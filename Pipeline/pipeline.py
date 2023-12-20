@@ -10,6 +10,8 @@ class Pipeline():
     def __init__(self, config):
         self.config = config
         self.estimator = HPEstimationFactory.Create(config)
+        self.tracklets = {}
+
         self.estim_time = AverageMeter()
 
     def process(self, himages):
@@ -23,5 +25,9 @@ class Pipeline():
                 imgOverlay = draw_keypoints(himg.data, hpsImg)
                 cv2.imshow("mywind", imgOverlay)
                 cv2.waitKey(1000)
+        for hp in hps:
+            if hp.viewpointId not in self.tracklets:
+                self.tracklets[hp.viewpointId] = []
+            self.tracklets[hp.viewpointId].append(hp)
         if self.config.verbose:
             print("time estimation : {est_time.avg:.3f}\t".format(est_time=self.estim_time))
