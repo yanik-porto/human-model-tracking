@@ -2,7 +2,7 @@ from .HP import HP
 import numpy as np
 
 class HPCoco(HP):
-    def __init__(self, image, skeleton):
+    def __init__(self, image, skeleton, confidences=None):
         bbox = self.skeleton_to_bbox(skeleton)
         super(HPCoco, self).__init__(image, bbox)
 
@@ -10,6 +10,7 @@ class HPCoco(HP):
         self.skeleton = []
         for i in range(skeleton.shape[0]):
             self.skeleton.append(skeleton[i, :3])
+        self.confidences = confidences
 
     def skeleton_to_bbox(self, skeleton):
         left = np.amin(skeleton[:, 0], axis=0)
