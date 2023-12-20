@@ -30,7 +30,9 @@ class Pipeline():
             for himg in himages:
                 hpsImg = [hp for hp in hps if hp.viewpointId == himg.viewpointId]
                 imgOverlay = draw_keypoints(himg.data, hpsImg)
-                cv2.imshow("mywind", imgOverlay)
+                imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
+                dispIm = cv2.resize(imgOverlay, (960, 540))
+                cv2.imshow("mywind", dispIm)
                 cv2.waitKey(1000)
         for hp in hps:
             if hp.viewpointId not in self.tracklets:
