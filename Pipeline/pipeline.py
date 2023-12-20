@@ -1,5 +1,6 @@
 from HPEstimation.HPEstimation import HPEstimation
 from HPEstimation import HPEstimationFactory 
+from Projector import Projector
 from settings.utils import AverageMeter
 
 import time
