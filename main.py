@@ -8,6 +8,7 @@ import cv2
 from settings.config import load_config
 from SensorData.HImage import HImage
 from Pipeline.pipeline import Pipeline
+from settings.utils import load_file_to_matrix
 
 def parse_args():
     parser = argparse.ArgumentParser("Read multiple videos and track people inside")
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     pipeline = Pipeline(config)
 
     # Collect videos info
-    metaByVid = {}
+    metaByVpath = {}
     for root, _, files in os.walk(args.videos_folder_path):
         for f in files:
             if not f.endswith(('.mkv', '.mp4', '.avi')):
@@ -33,17 +34,25 @@ if __name__ == "__main__":
             meta_data = vid.get_meta_data()
             print(meta_data)
 
+            fpathnoext, _ = os.path.splitext(fpath)
+            campath = fpathnoext + '.txt'
+            camP = load_file_to_matrix(campath)
+
             meta = {}
             meta['maxIdx'] = meta_data['duration'] * meta_data['fps']
+            meta['P'] = camP
+
             print(meta)
-            metaByVid[fpath] = meta
+            metaByVpath[fpath] = meta
+
+    pipeline.set_viewpoints(metaByVpath)
 
     idx = 0
     while(True):
         print(idx)
         images = []
-        for vidpath in metaByVid:
-            if idx < metaByVid[vidpath]['maxIdx']:
+        for vidpath in metaByVpath:
+            if idx < metaByVpath[vidpath]['maxIdx']:
                 img = iio.imread(vidpath, index=idx)
                 images.append(HImage(img, os.path.basename(vidpath)))
 

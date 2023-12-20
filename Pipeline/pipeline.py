@@ -4,6 +4,7 @@ from settings.utils import AverageMeter
 
 import time
 import cv2
+import os
 from HP.utils import draw_keypoints
 
 class Pipeline():
@@ -13,6 +14,11 @@ class Pipeline():
         self.tracklets = {}
 
         self.estim_time = AverageMeter()
+
+    def set_viewpoints(self, metaByVpath):
+        self.metaByVid = {}
+        for vpath in metaByVpath:
+            self.metaByVid[os.path.basename(vpath)] = metaByVpath[vpath]
 
     def process(self, himages):
         st = time.time()
