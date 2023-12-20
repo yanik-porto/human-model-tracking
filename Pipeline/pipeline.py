@@ -11,6 +11,7 @@ class Pipeline():
     def __init__(self, config):
         self.config = config
         self.estimator = HPEstimationFactory.Create(config)
+        self.projector = Projector()
         self.tracklets = {}
 
         self.estim_time = AverageMeter()
