@@ -10,6 +10,7 @@ class Pipeline():
     def __init__(self, config):
         self.config = config
         self.estimator = HPEstimationFactory.Create(config)
+        self.estim_time = AverageMeter()
 
     def process(self, himages):
         st = time.time()
