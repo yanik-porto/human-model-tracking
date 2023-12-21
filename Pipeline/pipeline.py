@@ -22,6 +22,8 @@ class Pipeline():
         for vpath in metaByVpath:
             self.metaByVid[os.path.basename(vpath)] = metaByVpath[vpath]
 
+        self.projector.set_viewpoints(self.metaByVid)
+
     def process(self, himages):
         st = time.time()
         hps = self.estimator.process(himages)
@@ -35,6 +37,15 @@ class Pipeline():
                 dispIm = cv2.resize(imgOverlay, (960, 540))
                 cv2.imshow("mywind", dispIm)
                 cv2.waitKey(1000)
+
+        # we estimate only one person per image
+        hpsByPerson = {}
+        if len(hps) > 0:
+            print("project")
+            hpsForP1 = []
+            hpsForP1 = hps
+            hpsByPerson["P1"] = hpsForP1  
+            skel3d = self.projector.process(hpsByPerson)
         for hp in hps:
             if hp.viewpointId not in self.tracklets:
                 self.tracklets[hp.viewpointId] = []
