@@ -13,15 +13,29 @@ class Projector:
 
     def process(self, hpsByPerson):
 
-        skelWithP = []
+        skels = []
+        Ps = []
+        skippedIdx = set()
         for person in hpsByPerson:
             for hp in hpsByPerson[person]:
                 P = self.metaByVid[hp.viewpointId]["P"]
-                skel = np.array(hp.skeleton, dtype=np.float32).transpose()
-                skelWithP.append((skel, P))
+                skel = np.array(hp.skeleton, dtype=np.float32)
+                for c in range(len(hp.confidences)):
+                    conf = hp.confidences[c]
+                    if conf < 0.01:
+                        skippedIdx.add(c)
+                skel = skel.transpose()
+                skels.append(skel)
+                Ps.append(P)
 
-        skel3d = cv2.triangulatePoints(skelWithP[0][1], skelWithP[1][1], skelWithP[0][0], skelWithP[1][0])
-        # print(skel3d)
+
+        for idx in reversed(list(skippedIdx)):
+            for s in range(len(skels)):
+                skels[s] = np.delete(skels[s], idx, 1)
+        skel3d = cv2.triangulatePoints(Ps[0], Ps[1], skels[0], skels[1])
+
+        for idx in skippedIdx:
+            skel3d = np.insert(skel3d, idx, [0, 0, 0, 1], axis=1)
 
         return skel3d.transpose()
         # hms = [HMSkeleton("P1", skel3d)]
