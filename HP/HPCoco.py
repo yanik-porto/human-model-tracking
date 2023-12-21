@@ -9,7 +9,7 @@ class HPCoco(HP):
         # self.skeleton : list of x, y, score
         self.skeleton = []
         for i in range(skeleton.shape[0]):
-            self.skeleton.append(skeleton[i, :3])
+            self.skeleton.append(skeleton[i, :2])
         self.confidences = confidences
 
     def skeleton_to_bbox(self, skeleton):

@@ -22,7 +22,7 @@ class AverageMeter(object):
 def load_file_to_matrix(filename):
     assert os.path.isfile(filename), "File not found: %s" % filename
 
-    camP = np.zeros((3, 4), dtype=np.float16)
+    camP = np.zeros((3, 4), dtype=np.float32)
     with open(filename, 'r') as mfile:
         lines = mfile.readlines()
         assert len(lines) == 3, str(lines)
