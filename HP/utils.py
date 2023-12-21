@@ -4,6 +4,12 @@ from random import randint
 
 seed(1)
 
+coco_part_labels = [
+    'nose', 'eye_l', 'eye_r', 'ear_l', 'ear_r',
+    'sho_l', 'sho_r', 'elb_l', 'elb_r', 'wri_l', 'wri_r',
+    'hip_l', 'hip_r', 'kne_l', 'kne_r', 'ank_l', 'ank_r'
+]
+
 def draw_keypoints(image, hpSkels):
     imageOverlay = image.copy()
     for hpSkel in hpSkels:
@@ -14,4 +20,5 @@ def draw_keypoints(image, hpSkels):
             if thickness > 10:
                 thickness = 10
             cv2.circle(imageOverlay, kptInt, radius=2, color=color, thickness=thickness)
+            cv2.putText(imageOverlay, coco_part_labels[i], kptInt, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
     return imageOverlay
