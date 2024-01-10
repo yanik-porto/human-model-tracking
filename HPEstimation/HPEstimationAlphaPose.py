@@ -51,13 +51,6 @@ class HPEstimationAlphaPose(HPEstimation):
 
         self.model = FastPose(norm_layer=nn.BatchNorm2d,**cfg)
         self.model.load_state_dict(torch.load("HPEstimation/AlphaPose/checkpoints/halpe26_fast_res50_256x192.pth"))
-
-    def process(self, himages):
-        dets = []
-        for himage in himages:
-            dets.extend(self.process_image(himage))
-        return dets
-
     
     def process_image(self, himage):
         image = himage.data

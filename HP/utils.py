@@ -11,6 +11,15 @@ coco_part_labels = [
     'head', 'neck', 'hip', 'btoe_l', 'btoe_r', 'stoe_l', 'stoe_r', 'heel_l', 'heel_r'
 ]
 
+def draw_bbox(image, hps):
+    imageOverlay = image.copy()
+    for hp in hps:
+        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+        xyxy = hp.xyxy()
+        cv2.rectangle(imageOverlay, (xyxy[0], xyxy[1]), (xyxy[2], xyxy[3]) , color)
+        # cv2.rectangle(imageOverlay, (xyxy[1], xyxy[0]), (xyxy[3], xyxy[2]) , color)
+    return imageOverlay
+
 def draw_keypoints(image, hpSkels):
     imageOverlay = image.copy()
     for hpSkel in hpSkels:

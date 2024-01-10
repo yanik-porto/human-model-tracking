@@ -1,10 +1,17 @@
 import HM.HM as HM
 
-class HPEstimation(object):
+from abc import ABC, abstractmethod
+
+class HPEstimation(ABC):
     def __init__(self):
         pass
 
     def process(self, himages):
-        pass
-
+        dets = []
+        for himage in himages:
+            dets.extend(self.process_image(himage))
+        return dets
     
+    @abstractmethod
+    def process_image(self, himage):
+        pass

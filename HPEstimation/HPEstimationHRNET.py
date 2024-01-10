@@ -78,13 +78,6 @@ class HPEstimationHRNET(HPEstimation):
         _C.merge_from_file("HPEstimation/HRNET/config.yaml")
         _C.freeze()
         return _C
-
-    def process(self, himages):
-        dets = []
-        for himage in himages:
-            dets.extend(self.process_image(himage))
-        return dets
-
     
     def process_image(self, himage):
         image = himage.data
