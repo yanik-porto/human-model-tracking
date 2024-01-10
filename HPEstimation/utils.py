@@ -36,12 +36,15 @@ def get_affine_transform(center,
                          rot,
                          output_size,
                          shift=np.array([0, 0], dtype=np.float32),
-                         inv=0):
+                         inv=0,
+                         hrnet=False):
     if not isinstance(scale, np.ndarray) and not isinstance(scale, list):
         print(scale)
         scale = np.array([scale, scale])
 
-    scale_tmp = scale * 200.0
+    scale_tmp = scale
+    if hrnet:
+        scale_tmp = scale * 200.0
     src_w = scale_tmp[0]
     dst_w = output_size[0]
     dst_h = output_size[1]
@@ -94,7 +97,7 @@ def resize_align_multi_scale(image, input_size, current_scale, min_scale):
     size_resized, center, scale = get_multi_scale_size(
         image, input_size, current_scale, min_scale
     )
-    trans = get_affine_transform(center, scale, 0, size_resized)
+    trans = get_affine_transform(center, scale, 0, size_resized, hrnet=True)
 
     image_resized = cv2.warpAffine(
         image,
@@ -225,10 +228,10 @@ def affine_transform(pt, t):
     new_pt = np.dot(t, new_pt)
     return new_pt[:2]
 
-def transform_preds(coords, center, scale, output_size):
+def transform_preds(coords, center, scale, output_size, hrnet=False):
     # target_coords = np.zeros(coords.shape)
     target_coords = coords.copy()
-    trans = get_affine_transform(center, scale, 0, output_size, inv=1)
+    trans = get_affine_transform(center, scale, 0, output_size, inv=1, hrnet=hrnet)
     for p in range(coords.shape[0]):
         target_coords[p, 0:2] = affine_transform(coords[p, 0:2], trans)
     return target_coords
@@ -237,8 +240,29 @@ def get_final_preds(grouped_joints, center, scale, heatmap_size):
     final_results = []
     for person in grouped_joints[0]:
         joints = np.zeros((person.shape[0], 3))
-        joints = transform_preds(person, center, scale, heatmap_size)
+        joints = transform_preds(person, center, scale, heatmap_size, hrnet=True)
         final_results.append(joints)
 
     return final_results
 
+
+def get_max_pred(heatmaps):
+    num_joints = heatmaps.shape[0]
+    width = heatmaps.shape[2]
+    heatmaps_reshaped = heatmaps.reshape((num_joints, -1))
+    idx = np.argmax(heatmaps_reshaped, 1)
+    maxvals = np.max(heatmaps_reshaped, 1)
+
+    maxvals = maxvals.reshape((num_joints, 1))
+    idx = idx.reshape((num_joints, 1))
+
+    preds = np.tile(idx, (1, 2)).astype(np.float32)
+
+    preds[:, 0] = (preds[:, 0]) % width
+    preds[:, 1] = np.floor((preds[:, 1]) / width)
+
+    pred_mask = np.tile(np.greater(maxvals, 0.0), (1, 2))
+    pred_mask = pred_mask.astype(np.float32)
+
+    preds *= pred_mask
+    return preds, maxvals

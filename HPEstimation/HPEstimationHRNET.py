@@ -1,7 +1,7 @@
 from .HPEstimation import HPEstimation
 from HP.HPCoco import HPCoco
 from .HRNET.pose_higher_hrnet import get_pose_net
-from .HRNET.utils import resize_align_multi_scale, get_multi_stage_outputs, aggregate_results, get_multi_scale_size, get_final_preds
+from .utils import resize_align_multi_scale, get_multi_stage_outputs, aggregate_results, get_multi_scale_size, get_final_preds
 from .HRNET.group import HeatmapParser
 
 import torch
@@ -112,7 +112,7 @@ class HPEstimationHRNET(HPEstimation):
         
         dets = []
         for skel in final_results:
-            dets.append(HPCoco(himage, skel[:, :3], skel[:, 3]))
+            dets.append(HPCoco(himage, skel[:, :2], skel[:, 3]))
         return dets
 
     def pre_process(self, image, scale):
