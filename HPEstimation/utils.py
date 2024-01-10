@@ -266,3 +266,51 @@ def get_max_pred(heatmaps):
 
     preds *= pred_mask
     return preds, maxvals
+
+def letterbox_image(img, inp_dim):
+    '''resize image with unchanged aspect ratio using padding'''
+    img_w, img_h = img.shape[1], img.shape[0]
+    w, h = inp_dim
+    new_w = int(img_w * min(w / img_w, h / img_h))
+    new_h = int(img_h * min(w / img_w, h / img_h))
+    resized_image = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+
+    canvas = np.full((inp_dim[1], inp_dim[0], 3), 128)
+
+    canvas[(h - new_h) // 2:(h - new_h) // 2 + new_h, (w - new_w) // 2:(w - new_w) // 2 + new_w, :] = resized_image
+
+    return canvas
+
+def heatmap_to_coord(hms, bbox, hms_flip=None, **kwargs):
+    if hms_flip is not None:
+        hms = (hms + hms_flip) / 2
+    if not isinstance(hms,np.ndarray):
+        hms = hms.cpu().data.numpy()
+    coords, maxvals = get_max_pred(hms)
+
+    hm_h = hms.shape[1]
+    hm_w = hms.shape[2]
+
+    # post-processing
+    for p in range(coords.shape[0]):
+        hm = hms[p]
+        px = int(round(float(coords[p][0])))
+        py = int(round(float(coords[p][1])))
+        if 1 < px < hm_w - 1 and 1 < py < hm_h - 1:
+            diff = np.array((hm[py][px + 1] - hm[py][px - 1],
+                             hm[py + 1][px] - hm[py - 1][px]))
+            coords[p] += np.sign(diff) * .25
+
+    preds = np.zeros_like(coords)
+
+    # transform bbox to scale
+    xmin, ymin, xmax, ymax = bbox
+    w = xmax - xmin
+    h = ymax - ymin
+    center = np.array([xmin + w * 0.5, ymin + h * 0.5])
+    scale = np.array([w, h])
+    # Transform back
+    preds = transform_preds(coords, center, scale,
+                                   [hm_w, hm_h])
+
+    return preds, maxvals

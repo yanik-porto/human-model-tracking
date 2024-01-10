@@ -1,0 +1,4 @@
+cython
+git+https://github.com/MVIG-SJTU/AlphaPose
+
+easydict

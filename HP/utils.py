@@ -7,7 +7,8 @@ seed(1)
 coco_part_labels = [
     'nose', 'eye_l', 'eye_r', 'ear_l', 'ear_r',
     'sho_l', 'sho_r', 'elb_l', 'elb_r', 'wri_l', 'wri_r',
-    'hip_l', 'hip_r', 'kne_l', 'kne_r', 'ank_l', 'ank_r'
+    'hip_l', 'hip_r', 'kne_l', 'kne_r', 'ank_l', 'ank_r', # end of normal coco label
+    'head', 'neck', 'hip', 'btoe_l', 'btoe_r', 'stoe_l', 'stoe_r', 'heel_l', 'heel_r'
 ]
 
 def draw_keypoints(image, hpSkels):
