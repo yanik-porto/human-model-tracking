@@ -7,12 +7,12 @@ class HPEstimationYolo(HPEstimation):
     def __init__(self):
         super(HPEstimationYolo, self).__init__()
 
-        self.model = YOLO("HPEstimation/YOLO/checkpoints/yolov8n.pt")
+        self.model_det = YOLO("HPEstimation/YOLO/checkpoints/yolov8n.pt")
 
     def process_image(self, himage):
 
         img = himage.data
-        preds = self.model.predict(img)
+        preds = self.model_det.predict(img)
         assert(len(preds) == 1)
 
         preds = preds[0].boxes
