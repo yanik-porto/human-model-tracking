@@ -15,3 +15,11 @@ class HP:
     
     def bbox_int(self):
         return [int(c) for c in self.bbox]
+    
+    def center_scale(self):
+        ul_corner = self.bbox[:2]
+        center = ul_corner + 0.5 * self.bbox[2:]
+        width = max(self.bbox[2], self.bbox[3])
+        scale = width / 200.0
+        # make sure the bounding box is rectangular
+        return center, scale
