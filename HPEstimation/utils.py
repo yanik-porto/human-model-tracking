@@ -291,26 +291,36 @@ def heatmap_to_coord(hms, bbox, hms_flip=None, **kwargs):
     hm_h = hms.shape[1]
     hm_w = hms.shape[2]
 
-    # post-processing
-    for p in range(coords.shape[0]):
-        hm = hms[p]
-        px = int(round(float(coords[p][0])))
-        py = int(round(float(coords[p][1])))
-        if 1 < px < hm_w - 1 and 1 < py < hm_h - 1:
-            diff = np.array((hm[py][px + 1] - hm[py][px - 1],
-                             hm[py + 1][px] - hm[py - 1][px]))
-            coords[p] += np.sign(diff) * .25
+    if False: # official version (which I don't make work)
 
-    preds = np.zeros_like(coords)
+        # post-processing
+        for p in range(coords.shape[0]):
+            hm = hms[p]
+            px = int(round(float(coords[p][0])))
+            py = int(round(float(coords[p][1])))
+            if 1 < px < hm_w - 1 and 1 < py < hm_h - 1:
+                diff = np.array((hm[py][px + 1] - hm[py][px - 1],
+                                hm[py + 1][px] - hm[py - 1][px]))
+                coords[p] += np.sign(diff) * .25
 
-    # transform bbox to scale
-    xmin, ymin, xmax, ymax = bbox
-    w = xmax - xmin
-    h = ymax - ymin
-    center = np.array([xmin + w * 0.5, ymin + h * 0.5])
-    scale = np.array([w, h])
-    # Transform back
-    preds = transform_preds(coords, center, scale,
-                                   [hm_w, hm_h])
+        preds = np.zeros_like(coords)
 
-    return preds, maxvals
+        # transform bbox to scale
+        xmin, ymin, xmax, ymax = bbox
+        w = xmax - xmin
+        h = ymax - ymin
+        center = np.array([xmin + w * 0.5, ymin + h * 0.5])
+        scale = np.array([w, h])
+
+        # Transform back
+        preds = transform_preds(coords, center, scale, (hm_w, hm_h))
+
+        return preds, maxvals
+    else:
+        xmin, ymin, xmax, ymax = bbox
+        dx = (xmax - xmin) / float(hm_w)
+        dy = (ymax - ymin) / float(hm_h)
+
+        for ic, coor in enumerate(coords):
+            coords[ic] = [coords[ic][0] * dx + xmin, coords[ic][1] * dy + ymin]
+        return coords, maxvals
