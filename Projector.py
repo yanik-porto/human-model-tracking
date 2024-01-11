@@ -18,6 +18,10 @@ class Projector:
         skippedIdx = set()
         for person in hpsByPerson:
             for hp in hpsByPerson[person]:
+                if not "P" in self.metaByVid[hp.viewpointId] or self.metaByVid[hp.viewpointId]["P"] is None:
+                    print("No projection matrix for viewpoint ", hp.viewpointId, " => abort projection")
+                    return None
+
                 P = self.metaByVid[hp.viewpointId]["P"]
                 skel = np.array(hp.skeleton, dtype=np.float32)
                 for c in range(len(hp.confidences)):

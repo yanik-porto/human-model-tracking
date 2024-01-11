@@ -20,7 +20,9 @@ class AverageMeter(object):
 
 
 def load_file_to_matrix(filename):
-    assert os.path.isfile(filename), "File not found: %s" % filename
+    if not os.path.isfile(filename):
+        print("File not found: ", filename)
+        return None
 
     camP = np.zeros((3, 4), dtype=np.float32)
     with open(filename, 'r') as mfile:
