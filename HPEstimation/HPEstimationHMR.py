@@ -60,21 +60,19 @@ class HPEstimationHMR(HPEstimationYolo):
             pred_joints = pred_joints[0].cpu().numpy()
             pred_vertices = pred_vertices[0].cpu().numpy()
             img_render = img_render.permute(1,2,0).cpu().numpy()
-            # img_shape = self.renderer(pred_vertices, camera_translation, img_render, pred_joints)
             
-            # Render side views
-            aroundy = cv2.Rodrigues(np.array([0, np.radians(90.), 0]))[0]
-            center = pred_vertices.mean(axis=0)
-            rot_vertices = np.dot((pred_vertices - center), aroundy) + center
-            
-            # Render non-parametric shape
-            img_shape_side = self.renderer(rot_vertices, camera_translation, np.ones_like(img_render), pred_joints)
-
-
-            # Save reconstructions
-            # outfile = "output"
-            # cv2.imwrite(outfile + '_shape' + str(i) +'.png', 255 * img_shape[:,:,::-1])
-            # cv2.imwrite(outfile + '_shape_side' + str(i) +'.png', 255 * img_shape_side[:,:,::-1])
+            if False:
+                # Render non-parametric shape
+                img_shape = self.renderer(pred_vertices, camera_translation, img_render, pred_joints)
+                # Render side views
+                aroundy = cv2.Rodrigues(np.array([0, np.radians(90.), 0]))[0]
+                center = pred_vertices.mean(axis=0)
+                rot_vertices = np.dot((pred_vertices - center), aroundy) + center
+                img_shape_side = self.renderer(rot_vertices, camera_translation, np.ones_like(img_render), pred_joints)
+                # Save reconstructions
+                outfile = "output"
+                cv2.imwrite(outfile + '_shape' + str(i) +'.png', 255 * img_shape[:,:,::-1])
+                cv2.imwrite(outfile + '_shape_side' + str(i) +'.png', 255 * img_shape_side[:,:,::-1])
 
             joints2d = self.renderer.project_joints(pred_joints, camera_translation)
 
