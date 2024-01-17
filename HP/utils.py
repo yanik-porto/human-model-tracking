@@ -17,7 +17,6 @@ def draw_bbox(image, hps):
         color = (randint(0, 255), randint(0, 255), randint(0, 255))
         xyxy = hp.xyxy()
         cv2.rectangle(imageOverlay, (xyxy[0], xyxy[1]), (xyxy[2], xyxy[3]) , color)
-        # cv2.rectangle(imageOverlay, (xyxy[1], xyxy[0]), (xyxy[3], xyxy[2]) , color)
     return imageOverlay
 
 def draw_keypoints(image, hpSkels):

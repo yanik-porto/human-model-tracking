@@ -281,7 +281,17 @@ def letterbox_image(img, inp_dim):
 
     return canvas
 
-def heatmap_to_coord(hms, bbox, hms_flip=None, **kwargs):
+def coords_to_bbox(coords, bboxxyxy, srcSizeW, srcSizeH):
+    xmin, ymin, xmax, ymax = bboxxyxy
+    dx = (xmax - xmin) / float(srcSizeW)
+    dy = (ymax - ymin) / float(srcSizeH)
+
+    for ic, coor in enumerate(coords):
+        coords[ic] = [coords[ic][0] * dx + xmin, coords[ic][1] * dy + ymin]
+    return coords
+
+def heatmap_to_coord(hms, bboxxyxy, hms_flip=None, **kwargs):
+
     if hms_flip is not None:
         hms = (hms + hms_flip) / 2
     if not isinstance(hms,np.ndarray):
@@ -317,10 +327,5 @@ def heatmap_to_coord(hms, bbox, hms_flip=None, **kwargs):
 
         return preds, maxvals
     else:
-        xmin, ymin, xmax, ymax = bbox
-        dx = (xmax - xmin) / float(hm_w)
-        dy = (ymax - ymin) / float(hm_h)
-
-        for ic, coor in enumerate(coords):
-            coords[ic] = [coords[ic][0] * dx + xmin, coords[ic][1] * dy + ymin]
+        coords = coords_to_bbox(coords, bboxxyxy, hm_w, hm_h)
         return coords, maxvals
