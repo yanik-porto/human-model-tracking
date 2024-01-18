@@ -3,6 +3,7 @@ from HM.SMPL.hmr import hmr
 from HM.SMPL.smpl import SMPL
 from HM.SMPL import constants
 from HP.HPCoco import HPCoco
+from HP.HPSMPL import HPSMPL
 from preprocessing.utils import crop
 from tools.renderer import Renderer
 from HPEstimation.utils import coords_to_bbox
@@ -40,9 +41,13 @@ class HPEstimationHMR(HPEstimationYolo):
         return norm_img, img # second image for rendering
 
     def process_image(self, himage):
-        dets = []
 
         hps = super().process_image(himage)
+
+        return self.process_hps(himage, hps)
+    
+    def process_hps(self, himage, hps):
+        dets = []
 
         img = himage.data
 
@@ -61,9 +66,11 @@ class HPEstimationHMR(HPEstimationYolo):
             pred_vertices = pred_vertices[0].cpu().numpy()
             img_render = img_render.permute(1,2,0).cpu().numpy()
             
-            if False:
+            if True:
                 # Render non-parametric shape
                 img_shape = self.renderer(pred_vertices, camera_translation, img_render, pred_joints)
+ 
+            if False:
                 # Render side views
                 aroundy = cv2.Rodrigues(np.array([0, np.radians(90.), 0]))[0]
                 center = pred_vertices.mean(axis=0)
@@ -77,6 +84,7 @@ class HPEstimationHMR(HPEstimationYolo):
             joints2d = self.renderer.project_joints(pred_joints, camera_translation)
 
             joints2d = coords_to_bbox(joints2d, hp.xyxy(), constants.IMG_RES, constants.IMG_RES)
-            dets.append(HPCoco(himage, joints2d, bbox=hp.bbox))
+            # dets.append(HPCoco(himage, joints2d, bbox=hp.bbox))
+            dets.append(HPSMPL(himage, joints2d, bbox=hp.bbox, img_rendered=img_shape))
 
         return dets
