@@ -25,7 +25,7 @@ def draw_keypoints(image, hpSkels):
         color = (randint(0, 255), randint(0, 255), randint(0, 255))
         for i, kpt in enumerate(hpSkel.skeleton):
             kptInt = kpt[:2].astype('int32')
-            thickness = 3 if hpSkel.confidences is None else int(hpSkel.confidences[i] * 1000)
+            thickness = 3 if len(hpSkel.confidences) == 0 else int(hpSkel.confidences[i] * 1000)
             if thickness > 10:
                 thickness = 10
             cv2.circle(imageOverlay, kptInt, radius=2, color=color, thickness=thickness)

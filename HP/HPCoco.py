@@ -2,7 +2,7 @@ from .HP import HP
 import numpy as np
 
 class HPCoco(HP):
-    def __init__(self, image, skeleton, confidences=None, bbox=None):
+    def __init__(self, image, skeleton, confidences=[], bbox=None):
         bbox = bbox if bbox is not None else self.skeleton_to_bbox(skeleton)
         super(HPCoco, self).__init__(image, bbox)
 
