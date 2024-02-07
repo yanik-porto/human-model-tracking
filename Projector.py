@@ -36,7 +36,11 @@ class Projector:
         for idx in reversed(list(skippedIdx)):
             for s in range(len(skels)):
                 skels[s] = np.delete(skels[s], idx, 1)
-        skel3d = cv2.triangulatePoints(Ps[0], Ps[1], skels[0], skels[1])
+        try:
+            skel3d = cv2.triangulatePoints(Ps[0], Ps[1], skels[0], skels[1])
+        except:
+            print("Ps[0]: ", Ps[0].shape, " | Ps[1]: ", Ps[1].shape, " | skels[0]: ", skels[0].shape, " | skels[1]: ", skels[1].shape)
+            return None
 
         for idx in skippedIdx:
             skel3d = np.insert(skel3d, idx, [0, 0, 0, 1], axis=1)
