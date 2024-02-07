@@ -8,6 +8,8 @@ class HPEstimationYolo(HPEstimation):
         super(HPEstimationYolo, self).__init__()
 
         self.model_det = YOLO("HPEstimation/YOLO/checkpoints/yolov8n.pt")
+        self.score_min = 0.5
+        self.model_det.conf = self.score_min
 
     def process_image(self, himage):
 
@@ -18,10 +20,11 @@ class HPEstimationYolo(HPEstimation):
         preds = preds[0].boxes
         boxes = preds.xyxy.cpu().numpy()
         classes = preds.cls.cpu().numpy()
+        confs = preds.conf.cpu().numpy()
  
         dets = []
-        for cl, box in zip(classes, boxes):
-            if int(cl) == 0:
+        for cl, box, conf in zip(classes, boxes, confs):
+            if int(cl) == 0 and conf >= self.score_min :
                 box[2] = box[2] - box[0]
                 box[3] = box[3] - box[1]
                 dets.append(HP(himage, box))
