@@ -30,4 +30,13 @@ def draw_keypoints(image, hpSkels):
                 thickness = 10
             cv2.circle(imageOverlay, kptInt, radius=2, color=color, thickness=thickness)
             cv2.putText(imageOverlay, coco_part_labels[i], kptInt, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+
+        # draw bbox
+        xyxy = hpSkel.xyxy()
+        cv2.rectangle(imageOverlay, (xyxy[0], xyxy[1]), (xyxy[2], xyxy[3]) , color)
+
+        # draw trackid
+        if hpSkel.trackid != -1:
+            cv2.putText(imageOverlay, str(hpSkel.trackid), ((xyxy[2] + xyxy[0]) // 2, (xyxy[3] + xyxy[1])//2 ), cv2.FONT_HERSHEY_DUPLEX, 3, color, thickness=3)
+
     return imageOverlay
