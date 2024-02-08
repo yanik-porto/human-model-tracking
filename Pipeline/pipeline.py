@@ -37,8 +37,8 @@ class Pipeline():
                 imgOverlay = draw_keypoints(himg.data, hpsImg)
                 imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
                 dispIm = cv2.resize(imgOverlay, (960, 540))
-                cv2.imshow("mywind", dispIm)
-                cv2.waitKey(1000)
+                cv2.imshow(himg.viewpointId, dispIm)
+                cv2.waitKey(100)
 
         self.estimate_shape(himages, hps)
 
@@ -49,7 +49,7 @@ class Pipeline():
             hpsForP1 = []
             hpsForP1 = hps
             hpsByPerson["P1"] = hpsForP1  
-            skel3d = self.projector.process(hpsByPerson)
+            skel3d = self.projector.process(hpsByPerson, self.estimator.minScoreKpt)
         for hp in hps:
             if hp.viewpointId not in self.tracklets:
                 self.tracklets[hp.viewpointId] = []
