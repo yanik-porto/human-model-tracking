@@ -7,6 +7,7 @@ import cv2
 from HPEstimation.HPEstimationHRNET import HPEstimationHRNET
 from HPEstimation.HPEstimationAlphaPose import HPEstimationAlphaPose
 from HPEstimation.HPEstimationYolo import HPEstimationYolo
+from HPEstimation.HPEstimationYoloPose import HPEstimationYoloPose
 from HPEstimation.HPEstimationHMR import HPEstimationHMR
 from HP.utils import draw_keypoints, draw_bbox
 from SensorData.HImage import HImage
@@ -39,15 +40,19 @@ class TestHumanPoseEstimation(unittest.TestCase):
 
     def test_alpha_pose(self):
         estimator = HPEstimationAlphaPose()
-        dets = run_estimator(estimator, save_keypoints=True, save_bbox=True)
+        dets = run_estimator(estimator, save_keypoints=True)
 
     def test_yolo(self):
         estimator = HPEstimationYolo()
         dets = run_estimator(estimator, save_bbox=True)
 
+    def test_yolo_pose(self):
+        estimator = HPEstimationYoloPose()
+        dets = run_estimator(estimator, save_keypoints=True)
+
     def test_hmr(self):
         estimator = HPEstimationHMR()
-        dets = run_estimator(estimator, save_bbox=True, save_keypoints=True)
+        dets = run_estimator(estimator, save_keypoints=True)
 
 if __name__ == '__main__':
     unittest.main()
