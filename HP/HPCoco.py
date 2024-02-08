@@ -2,9 +2,9 @@ from .HP import HP
 import numpy as np
 
 class HPCoco(HP):
-    def __init__(self, image, skeleton, confidences=[], bbox=None):
+    def __init__(self, image, skeleton, confidences=[], bbox=None, trackid=-1):
         bbox = bbox if bbox is not None else self.skeleton_to_bbox(skeleton, confidences)
-        super(HPCoco, self).__init__(image, bbox)
+        super(HPCoco, self).__init__(image, bbox, trackid=trackid)
 
         # self.skeleton : list of x, y, score
         self.skeleton = []

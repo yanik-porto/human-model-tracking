@@ -1,9 +1,10 @@
 class HP:
-    def __init__(self, image, bbox):
+    def __init__(self, image, bbox, trackid=-1):
         self.image = image
         # bbox : left top width height
         self.bbox = bbox
         self.viewpointId = self.image.viewpointId
+        self.trackid = trackid
 
     def xyxy(self):
         xmin = int(self.bbox[0])
