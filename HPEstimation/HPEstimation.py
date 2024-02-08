@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 class HPEstimation(ABC):
     def __init__(self):
-        pass
+        self.minScoreKpt = 0.1
 
     def process(self, himages):
         dets = []

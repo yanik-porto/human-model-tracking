@@ -12,6 +12,8 @@ class HPEstimationHRNET(HPEstimation):
     def __init__(self):
         super(HPEstimationHRNET, self).__init__()
 
+        self.minScoreKpt = 0.01
+
         self.cfg = self.load_config()
         model = get_pose_net(self.cfg, is_train=False)
         model.load_state_dict(torch.load(self.cfg.TEST.MODEL_FILE), strict=True)

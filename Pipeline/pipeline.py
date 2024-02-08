@@ -63,7 +63,7 @@ class Pipeline():
             hpsToProcess = []
             for hp in hpsImg:
                 if len(hp.confidences) > 0:
-                    goodJoints = np.sum(np.array(hp.confidences) > 0.01)
+                    goodJoints = np.sum(np.array(hp.confidences) > self.estimator.minScoreKpt) 
                     ratio = goodJoints / len(hp.confidences)
                     print("ratio: ", ratio)
                     if ratio > 0.7:

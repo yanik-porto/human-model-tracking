@@ -11,7 +11,7 @@ class Projector:
     def set_viewpoints(self, metaByVid):
         self.metaByVid = metaByVid
 
-    def process(self, hpsByPerson):
+    def process(self, hpsByPerson, minScoreKpt):
 
         skels = []
         Ps = []
@@ -26,7 +26,7 @@ class Projector:
                 skel = np.array(hp.skeleton, dtype=np.float32)
                 for c in range(len(hp.confidences)):
                     conf = hp.confidences[c]
-                    if conf < 0.01:
+                    if conf <= minScoreKpt:
                         skippedIdx.add(c)
                 skel = skel.transpose()
                 skels.append(skel)
