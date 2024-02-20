@@ -13,7 +13,10 @@ class Pipeline():
     def __init__(self, config):
         self.config = config
         self.estimator = HPEstimationFactory.Create(config)
-        self.estimator_shape = HPEstimationHMR()
+        
+        self.estimator_shape = None
+        if config.estimator_shape is not None:
+            self.estimator_shape = HPEstimationHMR()
         self.projector = Projector()
         self.tracklets = {}
 
@@ -40,7 +43,8 @@ class Pipeline():
                 cv2.imshow(himg.viewpointId, dispIm)
                 cv2.waitKey(100)
 
-        self.estimate_shape(himages, hps)
+        if self.estimator_shape is not None:
+            self.estimate_shape(himages, hps)
 
         # we estimate only one person per image
         hpsByPerson = {}
