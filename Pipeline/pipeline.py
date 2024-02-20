@@ -22,6 +22,8 @@ class Pipeline():
 
         self.estim_time = AverageMeter()
 
+        self.hpsByViewid = {}
+
     def set_viewpoints(self, metaByVpath):
         self.metaByVid = {}
         for vpath in metaByVpath:
@@ -33,6 +35,16 @@ class Pipeline():
         st = time.time()
         hps = self.estimator.process(himages)
         self.estim_time.update(time.time() - st)
+
+        for himg in himages:
+            if himg.viewpointId not in self.hpsByViewid:
+                self.hpsByViewid[himg.viewpointId] = []
+            hpsImg = [hp for hp in hps if hp.viewpointId == himg.viewpointId]
+            if len(hpsImg) == 0:
+                print("Problem for saving, add an empty projection instead")
+                continue
+            self.hpsByViewid[himg.viewpointId].append(hpsImg[0])
+
 
         if self.config.disp:
             for himg in himages:
@@ -74,3 +86,20 @@ class Pipeline():
                         hpsToProcess.append(hp)
             if len(hpsToProcess) > 0:
                 self.estimator_shape.process_hps(himg, hpsToProcess)
+
+    def save_projections(self, outFolder):
+        for viewid, hps in self.hpsByViewid.items():
+            outPath = os.path.join(outFolder, viewid + '.npz')
+
+            keypoints = []
+            keypoints_score = []
+            for hp in hps:
+                keypoints.append(hp.skeleton)
+                keypoints_score.append(hp.confidences)
+            
+            keypoints = np.asarray(keypoints, dtype=np.float32)
+            keypoints_score = np.asarray(keypoints_score, dtype=np.float32)
+            print(keypoints.shape)
+            print(keypoints_score.shape)
+
+            np.savez(outPath, keypoint=keypoints, keypoint_score=keypoints_score)

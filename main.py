@@ -70,3 +70,7 @@ if __name__ == "__main__":
         # cv2.imshow("mywind", images[0])
         # cv2.waitKey(1000 // config.target_fps // config.sampling_by_sec)
         idx += config.target_fps // config.sampling_by_sec
+
+    skelfolder = "/home/yanik/Documents/datasets/NTU/skeletons/"
+    if config.save_projections:
+        pipeline.save_projections(skelfolder)
