@@ -2,12 +2,12 @@ from HPEstimation.HPEstimationHMR import HPEstimationHMR
 from HPEstimation import HPEstimationFactory 
 from Projector import Projector
 from settings.utils import AverageMeter
-
 import time
 import cv2
 import os
 import numpy as np
 from HP.utils import draw_keypoints
+from pathlib import Path
 
 class Pipeline():
     def __init__(self, config):
@@ -22,7 +22,7 @@ class Pipeline():
     def set_viewpoints(self, metaByVpath):
         self.metaByVid = {}
         for vpath in metaByVpath:
-            self.metaByVid[os.path.basename(vpath)] = metaByVpath[vpath]
+            self.metaByVid[Path(vpath).stem] = metaByVpath[vpath]
 
         self.projector.set_viewpoints(self.metaByVid)
 
