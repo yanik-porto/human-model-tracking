@@ -6,6 +6,7 @@ class Config():
         self.disp = True
         self.estimator_shape = None
         self.verbose = True
+        self.save_projections = True
 
 def load_config():
     config = Config()
