@@ -53,9 +53,12 @@ if __name__ == "__main__":
         images = []
         for vidpath in metaByVpath:
             if idx < metaByVpath[vidpath]['maxIdx']:
-                img = iio.imread(vidpath, index=idx)
-                images.append(HImage(img, os.path.basename(vidpath)))
-
+                try:
+                    img = iio.imread(vidpath, index=idx)
+                    images.append(HImage(img, Path(vidpath).stem))
+                except:
+                    print("failed reading image from ", vidpath, " at index #", idx)
+                    continue
         if len(images) == 0:
             break
 
