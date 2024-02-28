@@ -11,7 +11,6 @@ class HP:
         ymin = int(self.bbox[1])
         xmax = int(self.bbox[0] + self.bbox[2])
         ymax = int(self.bbox[1] + self.bbox[3])
-        print(xmin)
         return xmin, ymin, xmax, ymax
     
     def bbox_int(self):
