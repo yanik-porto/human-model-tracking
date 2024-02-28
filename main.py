@@ -16,6 +16,7 @@ from settings.utils import load_file_to_matrix
 def parse_args():
     parser = argparse.ArgumentParser("Read multiple videos and track people inside")
     parser.add_argument("videos_folder_path", type=str, help="Path to the folder where the videos are stored")
+    parser.add_argument("--save_2d_folder", type=str, default=None, help="Path to the folder where the 2d projections are saved")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -71,6 +72,5 @@ if __name__ == "__main__":
         # cv2.waitKey(1000 // config.target_fps // config.sampling_by_sec)
         idx += config.target_fps // config.sampling_by_sec
 
-    skelfolder = "/home/yanik/Documents/datasets/NTU/skeletons/"
-    if config.save_projections:
-        pipeline.save_projections(skelfolder)
+    if args.save_2d_folder:
+        pipeline.hp_manager.save_projections(args.save_2d_folder)
