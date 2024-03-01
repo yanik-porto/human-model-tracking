@@ -1,4 +1,5 @@
 class HImage():
-    def __init__(self, data, viewpointId):
+    def __init__(self, data, srcPath):
         self.data = data
-        self.viewpointId = viewpointId
+        self.srcPath = srcPath
+        self.viewpointId = srcPath.stem

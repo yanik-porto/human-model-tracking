@@ -76,9 +76,9 @@ class HPManager:
             if len(hpsToProcess) > 0:
                 self.estimator_shape.process_hps(himg, hpsToProcess)
 
-    def save_projections(self, outFolder):
+    def save_projections(self):
         for tracker in self.trackers.values():
-            tracker.save_tracklets(outFolder)
+            tracker.save_tracklets()
 
     # if self.config.estimate_action:
     #     for viewId in self.tracklets:

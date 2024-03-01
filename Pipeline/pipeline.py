@@ -6,6 +6,11 @@ import os
 import numpy as np
 from pathlib import Path
 
+from SensorData.HImage import HImage
+from SensorData.utils import get_video_info
+import imageio.v3 as iio
+from tqdm import tqdm
+
 class Pipeline():
     def __init__(self, config):
         self.config = config
@@ -46,3 +51,43 @@ class Pipeline():
                         skel3d = self.projector.process(hpsByPerson, self.hp_manager.estimator.minScoreKpt)
                         if skel3d is not None:
                             self.skels3d.append(skel3d)
+
+
+def run_pipeline(folder_path, config):
+    pipeline = Pipeline(config)
+
+    # Collect videos info
+    metaByVpath = {}
+    maxIdxAll = 0
+    for root, _, files in os.walk(folder_path):
+        for f in files:
+            if not f.endswith(('.mkv', '.mp4', '.avi')):
+                continue
+
+            fpath = os.path.join(root, f)
+            meta = get_video_info(fpath)
+            metaByVpath[fpath] = meta
+
+        if meta['maxIdx'] > maxIdxAll:
+            maxIdxAll = meta['maxIdx']
+
+    # propagate camera information
+    pipeline.set_viewpoints(metaByVpath)
+
+    # process each image
+    for idx in tqdm(range(0, maxIdxAll, config.target_fps // config.sampling_by_sec)):
+        images = []
+        for vidpath in metaByVpath:
+            if idx < metaByVpath[vidpath]['maxIdx']:
+                try:
+                    img = iio.imread(vidpath, index=idx)
+                    images.append(HImage(img, Path(vidpath)))
+                except:
+                    print("failed reading image from ", vidpath, " at index #", idx)
+                    continue
+        if len(images) == 0:
+            break
+
+        pipeline.process(images)
+
+    return pipeline

@@ -33,8 +33,10 @@ class HPTracker:
                 if trackid not in hpids:
                     last = self.tracklets[trackid][-1]
                     skelshape = np.asarray(last.skeleton).shape
-                    confshape = np.asarray(last.confidences).shape 
-                    emptyskel = HPCoco(HImage(None, self.trackerid), np.zeros(skelshape, np.float32), np.zeros(confshape, np.float32), bbox=last.bbox, trackid=None)
+                    confshape = np.asarray(last.confidences).shape
+                    # dummyImg = HImage(None, self.trackerid)
+                    dummyImg = last.image # take previous one for getting all path info
+                    emptyskel = HPCoco(dummyImg, np.zeros(skelshape, np.float32), np.zeros(confshape, np.float32), bbox=last.bbox, trackid=None)
                     self.tracklets[trackid].append(emptyskel)
 
     def match_prev(self, hp):
@@ -49,8 +51,9 @@ class HPTracker:
 
         return idOfMax
     
-    def save_tracklets(self, outFolder):
+    def save_tracklets(self):
         for trackletid, hps in self.tracklets.items():
+            outFolder = hps[0].image.srcPath.parents[0]
             outPath = os.path.join(outFolder, self.trackerid + '_' + str(trackletid) + '.npz')
 
             keypoints = []

@@ -1,22 +1,16 @@
-import imageio
-import imageio.v3 as iio
 import argparse
 import os
 import sys
-import cv2
 import numpy as np
 import pickle
-from pathlib import Path
 
 from settings.config import load_config
-from SensorData.HImage import HImage
-from Pipeline.pipeline import Pipeline
-from settings.utils import load_file_to_matrix
+from Pipeline.pipeline import run_pipeline
 
 def parse_args():
     parser = argparse.ArgumentParser("Read multiple videos and track people inside")
     parser.add_argument("videos_folder_path", type=str, help="Path to the folder where the videos are stored")
-    parser.add_argument("--save_2d_folder", type=str, default=None, help="Path to the folder where the 2d projections are saved")
+    parser.add_argument("--save_2d_proj", action="store_true", default=False, help="Set if 2d projections need to be saved")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -24,53 +18,26 @@ if __name__ == "__main__":
 
     config = load_config()
 
-    pipeline = Pipeline(config)
+    pipeline = run_pipeline(args.videos_folder_path, config)
 
-    # Collect videos info
-    metaByVpath = {}
-    for root, _, files in os.walk(args.videos_folder_path):
-        for f in files:
-            if not f.endswith(('.mkv', '.mp4', '.avi')):
-                continue
+    if args.save_2d_proj:
+        pipeline.hp_manager.save_projections()
 
-            fpath = os.path.join(root, f)
-            vid = imageio.get_reader(fpath, "ffmpeg")
-            meta_data = vid.get_meta_data()
-            print(meta_data)
+    sys.exit(0)
 
-            fpathnoext, _ = os.path.splitext(fpath)
-            campath = fpathnoext + '.txt'
-            camP = load_file_to_matrix(campath)
+    with open("skel3d.pkl", "wb") as fsk:
+        pickle.dump(pipeline.skels3d, fsk)
 
-            meta = {}
-            meta['maxIdx'] = meta_data['duration'] * meta_data['fps']
-            meta['P'] = camP
 
-            print(meta)
-            metaByVpath[fpath] = meta
+    timestamps = []
 
-    pipeline.set_viewpoints(metaByVpath)
-
-    idx = 0
-    while(True):
-        print(idx)
+    for time in timestamps:
+        # TODO : collect images at timestamp
         images = []
-        for vidpath in metaByVpath:
-            if idx < metaByVpath[vidpath]['maxIdx']:
-                try:
-                    img = iio.imread(vidpath, index=idx)
-                    images.append(HImage(img, Path(vidpath).stem))
-                except:
-                    print("failed reading image from ", vidpath, " at index #", idx)
-                    continue
-        if len(images) == 0:
-            break
 
-        pipeline.process(images)
 
-        # cv2.imshow("mywind", images[0])
-        # cv2.waitKey(1000 // config.target_fps // config.sampling_by_sec)
-        idx += config.target_fps // config.sampling_by_sec
+        action = pipeline.action_sensor.current_action
+        n_persons = pipeline.tracker.n_persons
 
-    if args.save_2d_folder:
-        pipeline.hp_manager.save_projections(args.save_2d_folder)
+        print("current action: " + action)
+        print("current number of persons: ", n_persons)
