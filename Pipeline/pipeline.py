@@ -68,8 +68,8 @@ def run_pipeline(folder_path, config):
             meta = get_video_info(fpath)
             metaByVpath[fpath] = meta
 
-        if meta['maxIdx'] > maxIdxAll:
-            maxIdxAll = meta['maxIdx']
+            if meta['maxIdx'] > maxIdxAll:
+                maxIdxAll = meta['maxIdx']
 
     # propagate camera information
     pipeline.set_viewpoints(metaByVpath)
