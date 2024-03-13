@@ -10,15 +10,8 @@ def parse_args():
     parser.add_argument("--only_suffix", type=str, default=".npz", help="Set if only files with the given suffix have to be taken into account")
     return parser.parse_args()
 
-if __name__ == '__main__':
-    args = parse_args()
-
-    ntu_format = {}
-    ntu_format["split"] = {}
-    ntu_format["split"]["xsub_val"] = []
-    ntu_format["annotations"] = []
-
-    for root, _, files in os.walk(args.in_path):
+def fill_split(args, ntu_format, folder_path, split_name="xsub_val"):
+    for root, _, files in os.walk(folder_path):
         for f in files:
             if f.endswith(args.only_suffix):
                 print(f)
@@ -58,7 +51,27 @@ if __name__ == '__main__':
                 annot["total_frames"] = keypoint.shape[1]
 
                 ntu_format["annotations"].append(annot)
-                ntu_format["split"]["xsub_val"].append(frame_dir)
+                ntu_format["split"][split_name].append(frame_dir)
+
+        seq_len = len(ntu_format["split"][split_name])
+        print(f"Export {seq_len} sequences in {split_name}")
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    ntu_format = {}
+    ntu_format["split"] = {}
+    ntu_format["split"]["xsub_val"] = []
+    ntu_format["split"]["xsub_train"] = []
+    ntu_format["annotations"] = []
+
+    train_folder = os.path.join(args.in_path, 'train')
+    val_folder = os.path.join(args.in_path, 'val')
+
+    if os.path.isdir(train_folder):
+        fill_split(args, ntu_format, train_folder, "xsub_train")
+    if os.path.isdir(val_folder):
+        fill_split(args, ntu_format, val_folder, "xsub_val")
 
     with open(os.path.join(args.in_path, "ntu_custom.pkl"), "wb") as outf:
         pickle.dump(ntu_format, outf)
