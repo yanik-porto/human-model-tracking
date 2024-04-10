@@ -8,6 +8,8 @@ def parse_args():
     parser.add_argument("in_path", type=str, help="Path to input folder")
     parser.add_argument("--unknown_label", action="store_true", default=False, help="set if the label is unknown")
     parser.add_argument("--only_suffix", type=str, default=".npz", help="Set if only files with the given suffix have to be taken into account")
+    parser.add_argument("--train_folder", type=str, default="train", help="Name of the training folder")
+    parser.add_argument("--val_folder", type=str, default="val", help="Name of the validation folder")
     return parser.parse_args()
 
 def fill_split(args, ntu_format, folder_path, split_name="xsub_val"):
@@ -65,8 +67,8 @@ if __name__ == '__main__':
     ntu_format["split"]["xsub_train"] = []
     ntu_format["annotations"] = []
 
-    train_folder = os.path.join(args.in_path, 'train')
-    val_folder = os.path.join(args.in_path, 'val')
+    train_folder = os.path.join(args.in_path, args.train_foder)
+    val_folder = os.path.join(args.in_path, args.val_folder)
 
     if os.path.isdir(train_folder):
         fill_split(args, ntu_format, train_folder, "xsub_train")
