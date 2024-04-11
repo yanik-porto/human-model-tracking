@@ -7,6 +7,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Compress a list of skeleton files into a ntu dataset format")
     parser.add_argument("in_path", type=str, help="Path to input folder")
     parser.add_argument("--unknown_label", action="store_true", default=False, help="set if the label is unknown")
+    parser.add_argument("--verbose", action="store_true", default=False, help="set if need to print more information")
     parser.add_argument("--only_suffix", type=str, default=".npz", help="Set if only files with the given suffix have to be taken into account")
     parser.add_argument("--train_folder", type=str, default="train", help="Name of the training folder")
     parser.add_argument("--val_folder", type=str, default="val", help="Name of the validation folder")
@@ -16,10 +17,10 @@ def fill_split(args, ntu_format, folder_path, split_name="xsub_val"):
     for root, _, files in os.walk(folder_path):
         for f in files:
             if f.endswith(args.only_suffix):
-                print(f)
+                if args.verbose:
+                    print(f)
                 skel_path = os.path.join(root, f)
                 skel = dict(np.load(skel_path))
-                print(skel.keys())
 
                 if "keypoint" not in skel:
                     continue
@@ -55,8 +56,8 @@ def fill_split(args, ntu_format, folder_path, split_name="xsub_val"):
                 ntu_format["annotations"].append(annot)
                 ntu_format["split"][split_name].append(frame_dir)
 
-        seq_len = len(ntu_format["split"][split_name])
-        print(f"Export {seq_len} sequences in {split_name}")
+    seq_len = len(ntu_format["split"][split_name])
+    print(f"Export {seq_len} sequences in {split_name}")
 
 if __name__ == '__main__':
     args = parse_args()
