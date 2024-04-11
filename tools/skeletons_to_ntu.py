@@ -68,7 +68,7 @@ if __name__ == '__main__':
     ntu_format["split"]["xsub_train"] = []
     ntu_format["annotations"] = []
 
-    train_folder = os.path.join(args.in_path, args.train_foder)
+    train_folder = os.path.join(args.in_path, args.train_folder)
     val_folder = os.path.join(args.in_path, args.val_folder)
 
     if os.path.isdir(train_folder):
