@@ -6,6 +6,7 @@ import pickle
 def parse_args():
     parser = argparse.ArgumentParser(description="Compress a list of skeleton files into a ntu dataset format")
     parser.add_argument("in_path", type=str, help="Path to input folder")
+    parser.add_argument("--out_filename", type=str, default="ntu_custom.pkl", help="Name of the output file")
     parser.add_argument("--unknown_label", action="store_true", default=False, help="set if the label is unknown")
     parser.add_argument("--verbose", action="store_true", default=False, help="set if need to print more information")
     parser.add_argument("--only_suffix", type=str, default=".npz", help="Set if only files with the given suffix have to be taken into account")
@@ -76,6 +77,6 @@ if __name__ == '__main__':
     if os.path.isdir(val_folder):
         fill_split(args, ntu_format, val_folder, "xsub_val")
 
-    with open(os.path.join(args.in_path, "ntu_custom.pkl"), "wb") as outf:
+    with open(os.path.join(args.in_path, args.out_filename), "wb") as outf:
         pickle.dump(ntu_format, outf)
     
