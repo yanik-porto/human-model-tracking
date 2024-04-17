@@ -73,7 +73,7 @@ def nms(hps, nmsth):
     if len(hps) == 0:
         return hps
     
-    if len(hps[0].confidences) > 0:
+    if hasattr(hps[0], 'confidences') and len(hps[0].confidences) > 0:
         hps = sorted(hps, key=lambda x: sum(x.confidences), reverse=True)
 
     hpsOut = []
