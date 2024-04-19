@@ -8,6 +8,7 @@ from pathlib import Path
 
 from SensorData.HImage import HImage
 from SensorData.utils import get_video_info
+from settings.utils import AverageMeter
 import imageio.v3 as iio
 from tqdm import tqdm
 
@@ -52,8 +53,13 @@ class Pipeline():
                         if skel3d is not None:
                             self.skels3d.append(skel3d)
 
+    def print_stats(self):
+        print("time estimation : {est_time.avg:.3f}\t".format(est_time=self.hp_manager.estim_time))
+        print("time tracking : {est_time.avg:.3f}\t".format(est_time=self.hp_manager.tracking_time))
 
-def run_pipeline(folder_path, config):
+
+def run_pipeline(folder_path, config, use_tqdm=True):
+    print(f"Estimage 2d pose for folder {os.path.dirname(folder_path)}")
     pipeline = Pipeline(config)
 
     # Collect videos info
@@ -75,13 +81,23 @@ def run_pipeline(folder_path, config):
     pipeline.set_viewpoints(metaByVpath)
 
     # process each image
-    for idx in tqdm(range(0, maxIdxAll, config.target_fps // config.sampling_by_sec)):
+    loading_time = AverageMeter()
+    step = config.target_fps // config.sampling_by_sec
+    indexes = range(0, maxIdxAll, step)
+
+    if use_tqdm:
+        indexes = tqdm(indexes)
+
+    print("run on indexes: ", indexes)
+    for idx in indexes:
         images = []
         for vidpath in metaByVpath:
             if idx < metaByVpath[vidpath]['maxIdx']:
                 try:
+                    st = time.time()
                     img = iio.imread(vidpath, index=idx)
-                    images.append(HImage(img, Path(vidpath)))
+                    loading_time.update(time.time() - st)
+                    images.append(HImage(img, Path(vidpath), idx))
                 except:
                     print("failed reading image from ", vidpath, " at index #", idx)
                     continue
@@ -89,5 +105,8 @@ def run_pipeline(folder_path, config):
             break
 
         pipeline.process(images)
+
+    print("time loading : {est_time.avg:.3f}\t".format(est_time=loading_time))
+    pipeline.print_stats()
 
     return pipeline

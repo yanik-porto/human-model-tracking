@@ -8,6 +8,7 @@ from HP.utils import draw_keypoints
 import numpy as np
 import cv2
 import time
+import os
 
 class HPManager:
     def __init__(self, config):
@@ -29,6 +30,7 @@ class HPManager:
 
         # utils
         self.estim_time = AverageMeter()
+        self.tracking_time = AverageMeter()
 
 
     def process(self, himages):
@@ -41,10 +43,13 @@ class HPManager:
         if self.estimator_shape is not None:
             self.estimate_shape(himages, hps)
 
+        # tracking
+        st = time.time()
         for himg in himages:
             if himg.viewpointId not in self.trackers:
                 self.trackers[himg.viewpointId] = HPTracker(himg.viewpointId)
             self.trackers[himg.viewpointId].process(hps[himg.viewpointId])
+        self.tracking_time.update(time.time() - st)
             
         if self.config.disp:
             for (viewId, hpsImg) in hps.items():
