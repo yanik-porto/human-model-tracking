@@ -28,7 +28,7 @@ if __name__ == "__main__":
             folder_path = os.path.join(root, folder)
 
             if not args.overwrite:
-                npz_files = glob.glob(os.path.join(folder_path, "*.npz"))
+                npz_files = glob.glob(os.path.join(folder_path, "*[0-9].npz"))
                 if len(npz_files) > 0:
                     print(f"Skip estimation for {folder}, files exist yet")
                     continue 
