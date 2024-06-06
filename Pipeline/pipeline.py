@@ -98,8 +98,9 @@ def run_pipeline(folder_path, config, use_tqdm=True):
                     img = iio.imread(vidpath, index=idx)
                     loading_time.update(time.time() - st)
                     images.append(HImage(img, Path(vidpath), idx))
-                except:
+                except Exception as e:
                     print("failed reading image from ", vidpath, " at index #", idx)
+                    print(e)
                     continue
         if len(images) == 0:
             break
