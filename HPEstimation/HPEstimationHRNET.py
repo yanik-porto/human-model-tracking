@@ -57,7 +57,7 @@ class HPEstimationHRNET(HPEstimation):
         # Test Model Epoch
         _C.TEST.FLIP_TEST = False
         _C.TEST.ADJUST = True
-        _C.TEST.REFINE = True
+        _C.TEST.REFINE = False
         _C.TEST.SCALE_FACTOR = [1]
         # group
         _C.TEST.DETECTION_THRESHOLD = 0.2
