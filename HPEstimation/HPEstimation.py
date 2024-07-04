@@ -35,7 +35,7 @@ class HPEstimation(ABC):
                 maxConf = conf
                 idxMax = i
         if idxMax == -1:
-            print("error, idxmax is still -1")
+            print("error, idxmax is still -1 : ", len(hps), " estimations found")
             return hps
         
         return [hps[idxMax]]

@@ -107,7 +107,7 @@ class HPEstimationHRNET(HPEstimation):
         
         dets = []
         for skel in final_results:
-            dets.append(HPCoco(himage, skel[:, :2], skel[:, 3]))
+            dets.append(HPCoco(himage, skel[:, :2], skel[:, 2]))
 
         return dets
 
