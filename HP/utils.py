@@ -11,10 +11,14 @@ coco_part_labels = [
     'head', 'neck', 'hip', 'btoe_l', 'btoe_r', 'stoe_l', 'stoe_r', 'heel_l', 'heel_r'
 ]
 
+colors = []
+for clridx in range(30):
+    colors.append((randint(0, 255), randint(0, 255), randint(0, 255)))
+
 def draw_bbox(image, hps):
     imageOverlay = image.copy()
     for hp in hps:
-        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+        color = colors[hp.trackid]
         xyxy = hp.xyxy()
         cv2.rectangle(imageOverlay, (xyxy[0], xyxy[1]), (xyxy[2], xyxy[3]) , color)
     return imageOverlay
@@ -22,7 +26,10 @@ def draw_bbox(image, hps):
 def draw_keypoints(image, hpSkels):
     imageOverlay = image.copy()
     for hpSkel in hpSkels:
-        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+        if hpSkel.trackid is not None and hpSkel.trackid != -1:
+            color = colors[hpSkel.trackid]
+        else:
+            color = (randint(0, 255), randint(0, 255), randint(0, 255))
         for i, kpt in enumerate(hpSkel.skeleton):
             kptInt = kpt[:2].astype('int32')
             thickness = 3 if len(hpSkel.confidences) == 0 else int(hpSkel.confidences[i] * 1000)
