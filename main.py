@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 
 from settings.config import load_config
-from Pipeline.pipeline import run_pipeline
+from Pipeline.runner_folder import run_pipeline
 
 def parse_args():
     parser = argparse.ArgumentParser("Read multiple videos and track people inside")

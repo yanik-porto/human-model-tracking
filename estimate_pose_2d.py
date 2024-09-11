@@ -4,7 +4,7 @@ import glob
 import concurrent.futures
 
 from settings.config import load_config
-from Pipeline.pipeline import run_pipeline
+from Pipeline.runner_folder import run_pipeline
 
 def parse_args():
     parser = argparse.ArgumentParser("Read multiple set of videos and save pose estimation")
@@ -14,7 +14,7 @@ def parse_args():
     return parser.parse_args()
 
 def run_pipeline_and_save_projections(folder_path, config, use_tqdm=True):
-    pipeline = run_pipeline(folder_path, config, use_tqdm=use_tqdm)
+    pipeline = run_pipeline(folder_path, config, use_tqdm=use_tqdm, plugin="pyav")
     pipeline.hp_manager.save_projections()
 
 if __name__ == "__main__":
