@@ -30,7 +30,7 @@ class FastPose(nn.Module):
             self.preact = SEResnet(f"resnet{cfg['NUM_LAYERS']}")
 
         # Imagenet pretrain model
-        import torchvision.models as tm   # noqa: F401,F403
+        # import torchvision.models as tm   # noqa: F401,F403
         assert cfg['NUM_LAYERS'] in [18, 34, 50, 101, 152]
         x = eval(f"tm.resnet{cfg['NUM_LAYERS']}(pretrained=True)")
 

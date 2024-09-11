@@ -3,7 +3,6 @@ from HP.HPCoco import HPCoco
 
 import torch
 import torch.nn as nn
-import torchvision
 from yacs.config import CfgNode as CN
 import yaml
 from easydict import EasyDict as edict

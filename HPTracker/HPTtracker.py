@@ -15,6 +15,7 @@ class HPTracker:
 
         # add an empty detection if not found in an image
         self.emptyIfNotFound = True
+        self.retrieveNotFoundLaterOn = True
 
     def process(self, hps):
         for hp in hps:
@@ -36,7 +37,8 @@ class HPTracker:
                     confshape = np.asarray(last.confidences).shape
                     # dummyImg = HImage(None, self.trackerid)
                     dummyImg = last.image # take previous one for getting all path info
-                    emptyskel = HPCoco(dummyImg, np.zeros(skelshape, np.float32), np.zeros(confshape, np.float32), bbox=last.bbox, trackid=None)
+                    bboxNotFound =  last.bbox if self.retrieveNotFoundLaterOn else (0, 0, 0, 0)
+                    emptyskel = HPCoco(dummyImg, np.zeros(skelshape, np.float32), np.zeros(confshape, np.float32), bbox=bboxNotFound, trackid=trackid)
                     self.tracklets[trackid].append(emptyskel)
 
     def match_prev(self, hp):
