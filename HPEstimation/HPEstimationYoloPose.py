@@ -1,11 +1,12 @@
 from ultralytics import YOLO
+import os
 
 from .HPEstimation import HPEstimation
 from HP.HPCoco import HPCoco, HP
 
 class HPEstimationYoloPose(HPEstimation):
-    def __init__(self):
-        super(HPEstimationYoloPose, self).__init__()
+    def __init__(self, *args):
+        super(HPEstimationYoloPose, self).__init__(*args)
 
         self.minScoreKpt = 0.5
 
@@ -18,7 +19,7 @@ class HPEstimationYoloPose(HPEstimation):
         dets = []
 
         img = himage.data
-        preds = self.model_det.track(img, persist=True, tracker="bytetrack.yaml")
+        preds = self.model_det.track(img, persist=True, tracker="bytetrack.yaml", verbose=self.verbose)
         # preds = self.model_det.predict(img)
         assert(len(preds) == 1)
 

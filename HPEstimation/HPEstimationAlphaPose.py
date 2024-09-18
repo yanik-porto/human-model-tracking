@@ -34,8 +34,8 @@ def pre_process(img, inp_dim):
     return img_, orig_im, dim
 
 class HPEstimationAlphaPose(HPEstimationYolo):
-    def __init__(self):
-        super(HPEstimationAlphaPose, self).__init__()
+    def __init__(self, *args):
+        super(HPEstimationAlphaPose, self).__init__(*args)
 
         if not os.path.isfile("HPEstimation/AlphaPose/256x192_res50_lr1e-3_1x.yaml"):
             print("no config file found")

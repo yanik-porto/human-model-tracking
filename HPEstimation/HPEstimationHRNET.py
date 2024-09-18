@@ -9,8 +9,8 @@ import torchvision
 from yacs.config import CfgNode as CN
 
 class HPEstimationHRNET(HPEstimation):
-    def __init__(self):
-        super(HPEstimationHRNET, self).__init__()
+    def __init__(self, *args):
+        super(HPEstimationHRNET, self).__init__(*args)
 
         self.minScoreKpt = 0.01
 

@@ -14,8 +14,8 @@ from torchvision.transforms import Normalize
 import cv2
 
 class HPEstimationHMR(HPEstimationYolo):
-    def __init__(self):
-        super(HPEstimationHMR, self).__init__()
+    def __init__(self, *args):
+        super(HPEstimationHMR, self).__init__(*args)
 
         self.model = hmr('HPEstimation/HMR/data/smpl_mean_params.npz').cuda()
         checkpoint = torch.load('HPEstimation/HMR/data/spin_checkpoint.pt', map_location="cuda")

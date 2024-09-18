@@ -4,10 +4,11 @@ from HP.utils import nms
 import numpy as np
 from abc import ABC, abstractmethod
 class HPEstimation(ABC):
-    def __init__(self):
+    def __init__(self, verbose=False):
         self.minScoreKpt = 0.1
         self.nmsth = 0.5
         self.keepOnlyOne = True
+        self.verbose = verbose
 
     def process(self, himages):
         dets = {}

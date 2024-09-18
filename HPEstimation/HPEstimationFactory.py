@@ -7,13 +7,13 @@ def Create(config):
     estimator = None
 
     if config.estimator == "hrnet":
-        estimator = HPEstimationHRNET()
+        estimator = HPEstimationHRNET(config.verbose)
     elif config.estimator == "alpha_pose":
-        estimator = HPEstimationAlphaPose()
+        estimator = HPEstimationAlphaPose(config.verbose)
     elif config.estimator == "hmr":
-        estimator = HPEstimationHMR()
+        estimator = HPEstimationHMR(config.verbose)
     elif config.estimator == "yolo_pose":
-        estimator = HPEstimationYoloPose()
+        estimator = HPEstimationYoloPose(config.verbose)
     else:
         print("Unknown estimator")
 
