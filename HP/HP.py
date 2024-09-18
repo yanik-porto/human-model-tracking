@@ -5,6 +5,7 @@ class HP:
         self.bbox = bbox
         self.viewpointId = self.image.viewpointId
         self.trackid = trackid
+        self.lastAction = "unknown"
 
     def xyxy(self):
         xmin = int(self.bbox[0])
