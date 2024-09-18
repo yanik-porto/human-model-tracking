@@ -25,7 +25,9 @@ class HPTracker:
                     matchid = self.ids_manager.get_new_id()
                     self.tracklets[matchid] = []
                 hp.trackid = matchid
-                self.tracklets[matchid].append(hp)
+            if not hp.trackid in self.tracklets:
+                self.tracklets[hp.trackid] = []
+            self.tracklets[hp.trackid].append(hp)
 
         # fill tracklets with null skeleton if not found in the image
         if self.emptyIfNotFound:

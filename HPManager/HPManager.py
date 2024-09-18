@@ -48,7 +48,8 @@ class HPManager:
         for himg in himages:
             if himg.viewpointId not in self.trackers:
                 self.trackers[himg.viewpointId] = HPTracker(himg.viewpointId)
-            self.trackers[himg.viewpointId].process(hps[himg.viewpointId])
+            if himg.viewpointId in hps:
+                self.trackers[himg.viewpointId].process(hps[himg.viewpointId])
         self.tracking_time.update(time.time() - st)
         
         # estimate action
@@ -56,13 +57,14 @@ class HPManager:
             self.get_action()
 
         if self.config.disp:
-            for (viewId, hpsImg) in hps.items():
-                print("draw ", len(hpsImg), " skeletons")
-                himg = next(himg for himg in himages if himg.viewpointId == viewId)
-                if not himg:
-                    continue
-
-                imgOverlay = draw_keypoints(himg.data, hpsImg)
+            for himg in himages:
+                viewId = himg.viewpointId
+                imgOverlay = himg.data
+                if viewId in hps:
+                    hpsImg = hps[viewId]
+                    if self.config.verbose:
+                        print("draw ", len(hpsImg), " skeletons")
+                    imgOverlay = draw_keypoints(imgOverlay, hpsImg)
                 imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
                 dispIm = cv2.resize(imgOverlay, (960, 540))
                 cv2.imshow(viewId, dispIm)
@@ -97,6 +99,5 @@ class HPManager:
                 if len(hps) > self.action_sensor.maxlen:
                     hps = hps[-self.action_sensor.maxlen:]
 
-                # print("Get action from view #", viewId, " and tracklet #", trackid)
                 action_pred = self.action_sensor.process(hps)
                 hps[-1].lastAction = action_pred
