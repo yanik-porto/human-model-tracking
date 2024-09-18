@@ -8,7 +8,7 @@ from SensorData.HImage import HImage
 from HP.utils import draw_keypoints
 
 def parse_args():
-    parser = argparse.ArgumentParser("Read live strem and appy human tracking")
+    parser = argparse.ArgumentParser("Read live stream and apply human tracking")
     parser.add_argument("url", type=str, help="Url of the live stream to process (ex: rtsp://192.168.1.88:554/live.sdp)")
     return parser.parse_args()
 
@@ -16,6 +16,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     config = load_config()
+    config.disp = True
     step = config.target_fps // config.sampling_by_sec
 
     pipeline = Pipeline(config)
@@ -47,13 +48,6 @@ if __name__ == '__main__':
         images = []
         images.append(himg)
         pipeline.process(images)
-        hps = pipeline.last_hps(himg.viewpointId)
-        frame = draw_keypoints(himg.data, hps)
-
-        # Display the resulting frame
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) == ord('q'):
-            break
 
         idxframe+=1
     
