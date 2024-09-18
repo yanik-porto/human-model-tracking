@@ -1,6 +1,6 @@
 from HPEstimation.HPEstimationHMR import HPEstimationHMR
 from HPEstimation import HPEstimationFactory 
-from HPAction.HPActionSTGCN import HPActionSTGCN
+from HPAction.HPActionUNIK import HPActionUNIK
 from HPTracker.HPTtracker import HPTracker
 from settings.utils import AverageMeter
 from HP.utils import draw_keypoints
@@ -23,7 +23,7 @@ class HPManager:
             self.estimator_shape = HPEstimationHMR()
 
         # action classifier
-        self.action_sensor = HPActionSTGCN()
+        self.action_sensor = HPActionUNIK()
 
         # tracker for each view
         self.trackers = {}
@@ -50,7 +50,11 @@ class HPManager:
                 self.trackers[himg.viewpointId] = HPTracker(himg.viewpointId)
             self.trackers[himg.viewpointId].process(hps[himg.viewpointId])
         self.tracking_time.update(time.time() - st)
-            
+        
+        # estimate action
+        if self.config.estimate_action:
+            self.get_action()
+
         if self.config.disp:
             for (viewId, hpsImg) in hps.items():
                 print("draw ", len(hpsImg), " skeletons")
@@ -62,7 +66,9 @@ class HPManager:
                 imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
                 dispIm = cv2.resize(imgOverlay, (960, 540))
                 cv2.imshow(viewId, dispIm)
-                cv2.waitKey(100)
+
+                cv2.waitKey(1)
+
 
         if self.config.verbose:
             print("time estimation : {est_time.avg:.3f}\t".format(est_time=self.estim_time))
@@ -85,8 +91,12 @@ class HPManager:
         for tracker in self.trackers.values():
             tracker.save_tracklets()
 
-    # if self.config.estimate_action:
-    #     for viewId in self.tracklets:
-    #         if len(self.tracklets[viewId]) == self.action_sensor.maxlen:
-    #             print("Get action from view #", viewId)
-    #             self.action_sensor.process(self.tracklets[viewId])
+    def get_action(self):
+        for viewId in self.trackers:
+            for trackid, hps in self.trackers[viewId].tracklets.items():
+                if len(hps) > self.action_sensor.maxlen:
+                    hps = hps[-self.action_sensor.maxlen:]
+
+                # print("Get action from view #", viewId, " and tracklet #", trackid)
+                action_pred = self.action_sensor.process(hps)
+                hps[-1].lastAction = action_pred

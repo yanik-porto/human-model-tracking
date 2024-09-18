@@ -43,6 +43,7 @@ if __name__ == '__main__':
             continue
 
         frame = cv2.resize(frame, (640, 480))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         himg = HImage(frame, Path("/home/user/dummy"), idxframe)
 
         images = []

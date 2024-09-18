@@ -1,0 +1,27 @@
+encoder:
+  name: 'unik'
+  params:
+    num_class: 120
+    num_joints: 17
+    num_person: 1
+    in_channels: 3
+
+head:
+  name: 'pool'
+  params:
+    num_classes: 120
+    in_channels: 256
+
+preprocessing:
+  PreNormalize2D:
+    threshold: 0.01
+    mode: 'auto'
+  UniformSample:
+    clip_len: 50
+    reproducible: True
+  PoseDecode: 0
+  Collect:
+      keys: ['keypoint']
+      meta_keys: []
+  ToTensor:
+      keys: ['keypoint']
