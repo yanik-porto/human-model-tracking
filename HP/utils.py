@@ -23,7 +23,7 @@ def draw_bbox(image, hps):
         cv2.rectangle(imageOverlay, (xyxy[0], xyxy[1]), (xyxy[2], xyxy[3]) , color)
     return imageOverlay
 
-def draw_keypoints(image, hpSkels):
+def draw_keypoints(image, hpSkels, writeKptsName=False):
     imageOverlay = image.copy()
     for hpSkel in hpSkels:
         if hpSkel.trackid is not None and hpSkel.trackid != -1:
@@ -36,7 +36,8 @@ def draw_keypoints(image, hpSkels):
             if thickness > 10:
                 thickness = 10
             cv2.circle(imageOverlay, kptInt, radius=2, color=color, thickness=thickness)
-            cv2.putText(imageOverlay, coco_part_labels[i], kptInt, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+            if writeKptsName:
+                cv2.putText(imageOverlay, coco_part_labels[i], kptInt, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
 
         # draw bbox
         xyxy = hpSkel.xyxy()
@@ -46,6 +47,7 @@ def draw_keypoints(image, hpSkels):
         if hpSkel.trackid != -1:
             cv2.putText(imageOverlay, str(hpSkel.trackid), ((xyxy[2] + xyxy[0]) // 2, (xyxy[3] + xyxy[1])//2 ), cv2.FONT_HERSHEY_DUPLEX, 3, color, thickness=3)
 
+        cv2.putText(imageOverlay, hpSkel.lastAction, ((xyxy[2] + xyxy[0]) // 4, (xyxy[3] + xyxy[1])//4), cv2.FONT_HERSHEY_DUPLEX, 1, color, thickness=1)
     return imageOverlay
 
 def intersection(a,b):
