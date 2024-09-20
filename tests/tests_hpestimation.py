@@ -4,6 +4,7 @@ sys.path.insert(0, os.getcwd())
 import unittest
 import cv2
 from pathlib import Path
+import time
 
 from HPEstimation.HPEstimationHRNET import HPEstimationHRNET
 from HPEstimation.HPEstimationAlphaPose import HPEstimationAlphaPose
@@ -17,7 +18,9 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
     img = cv2.imread(imagePath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     himg = HImage(img, Path(imagePath))
+    start_time = time.time()
     dets = estimator.process([himg])
+    end_time = time.time()
     print(len(dets), " skeleton detected")
 
     if save_keypoints:
@@ -31,6 +34,9 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
         imgOutPath = imagePath.replace(".jpg", "_bboxes_" + estimator.__class__.__name__ + ".jpg")
         imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
         cv2.imwrite(imgOutPath, imgOverlay)
+
+    inference_time = end_time - start_time
+    print(f"{estimator.__class__.__name__} : Inference time: {inference_time:.6f} seconds")
 
     return dets
 
