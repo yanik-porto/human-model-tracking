@@ -49,6 +49,8 @@ class HPEstimationAlphaPose(HPEstimationYolo):
 
         self.model = FastPose(norm_layer=nn.BatchNorm2d,**cfg)
         self.model.load_state_dict(torch.load("HPEstimation/AlphaPose/checkpoints/halpe26_fast_res50_256x192.pth"))
+        self.model = self.model.cuda()
+        self.model.eval()
     
     def process_image(self, himage):
         dets = []
@@ -59,6 +61,7 @@ class HPEstimationAlphaPose(HPEstimationYolo):
             roi = hp.bbox_int()
             crop = himage.data[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
             img, _, _ = pre_process(crop, self.inp_dim)
+            img = img.cuda()
             out = self.model(img)
 
             pose_coords_body_foot, pose_scores_body_foot = heatmap_to_coord(
