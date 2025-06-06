@@ -23,7 +23,9 @@ if __name__ == '__main__':
     metainfos = {args.url: {"maxIdx": 60 * 25} } # 1 minute
     pipeline.set_viewpoints(metainfos)
 
-    cap = cv2.VideoCapture(args.url)
+    url = args.url if not args.url.isdigit() else int(args.url)
+
+    cap = cv2.VideoCapture(url)
     if not cap.isOpened():
         print("Cannot open camera")
         exit()
