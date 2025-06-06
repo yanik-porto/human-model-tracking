@@ -2,11 +2,11 @@ from .HP import HP
 import numpy as np
 
 class HPCoco(HP):
-    def __init__(self, image, skeleton, confidences=[], bbox=None, trackid=-1):
+    def __init__(self, image, skeleton, confidences=[], bbox=None, trackid=-1, detscore=-1):
         bbox = bbox if bbox is not None else self.skeleton_to_bbox(skeleton, confidences)
-        super(HPCoco, self).__init__(image, bbox, trackid=trackid)
+        super(HPCoco, self).__init__(image, bbox, trackid=trackid, detscore=detscore)
 
-        # self.skeleton : list of x, y, score
+        # self.skeleton : list of x, y
         self.skeleton = []
         for i in range(skeleton.shape[0]):
             self.skeleton.append(skeleton[i, :2])

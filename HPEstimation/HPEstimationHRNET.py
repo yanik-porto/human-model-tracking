@@ -5,7 +5,9 @@ from .utils import resize_align_multi_scale, get_multi_stage_outputs, aggregate_
 from .HRNET.group import HeatmapParser
 
 import torch
-import torchvision
+# import torchvision
+import albumentations as A
+from albumentations.pytorch.transforms import ToTensorV2
 from yacs.config import CfgNode as CN
 
 class HPEstimationHRNET(HPEstimation):
@@ -20,15 +22,23 @@ class HPEstimationHRNET(HPEstimation):
         self.model = torch.nn.DataParallel(model).cuda()
         self.model.eval()
 
-        self.transforms = torchvision.transforms.Compose(
-            [
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406],
-                    std=[0.229, 0.224, 0.225]
-                )
-            ]
-        )
+        if False:
+            self.transforms = torchvision.transforms.Compose(
+                [
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Normalize(
+                        mean=[0.485, 0.456, 0.406],
+                        std=[0.229, 0.224, 0.225]
+                    )
+                ]
+            )
+        else:
+            self.transforms = []
+            self.transforms.append(A.Normalize(
+                        mean=[0.485, 0.456, 0.406],
+                        std=[0.229, 0.224, 0.225]))
+            self.transforms.append(ToTensorV2())
+            self.transforms = A.Compose(self.transforms)
 
         self.input_size = self.cfg.DATASET.INPUT_SIZE
         self.scale_factor = self.cfg.TEST.SCALE_FACTOR
@@ -106,8 +116,9 @@ class HPEstimationHRNET(HPEstimation):
             )
         
         dets = []
-        for skel in final_results:
-            dets.append(HPCoco(himage, skel[:, :2], skel[:, 2]))
+        for iS, skel in enumerate(final_results):
+            detscore = -1 if len(scores) != len(final_results) else scores[iS]
+            dets.append(HPCoco(himage, skel[:, :2], skel[:, 2], detscore=detscore))
 
         return dets
 
@@ -115,7 +126,8 @@ class HPEstimationHRNET(HPEstimation):
         image_resized, center, scale = resize_align_multi_scale(
             image, self.input_size, scale, min(self.scale_factor)
         )
-        image_resized = self.transforms(image_resized)
+        # image_resized = self.transforms(image_resized)
+        image_resized = self.transforms(image=image_resized)['image']
         image_resized = image_resized.unsqueeze(0).cuda()
         return image_resized
 
