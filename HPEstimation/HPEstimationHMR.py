@@ -2,16 +2,17 @@ from .HPEstimationYolo import HPEstimationYolo
 from HM.SMPL.hmr import hmr
 from HM.SMPL.smpl import SMPL
 from HM.SMPL import constants
-from HP.HPCoco import HPCoco
 from HP.HPSMPL import HPSMPL
 from preprocessing.utils import crop
 from tools.renderer import Renderer
+from tools.scene3d import Scene3D
 from HPEstimation.utils import coords_to_bbox
 
 import numpy as np
 import torch
 from torchvision.transforms import Normalize
 import cv2
+import time
 
 class HPEstimationHMR(HPEstimationYolo):
     def __init__(self, *args):
@@ -29,7 +30,11 @@ class HPEstimationHMR(HPEstimationYolo):
 
         self.normalize_img = Normalize(mean=constants.IMG_NORM_MEAN, std=constants.IMG_NORM_STD)
 
-        self.renderer = Renderer(focal_length=constants.FOCAL_LENGTH, img_res=constants.IMG_RES, faces=self.smpl.faces)
+        self.render_mesh = False
+        if self.render_mesh:
+            self.renderer = Renderer(focal_length=constants.FOCAL_LENGTH, img_res=constants.IMG_RES, faces=self.smpl.faces)
+        else:
+            self.renderer = Scene3D(focal_length=constants.FOCAL_LENGTH, img_res=constants.IMG_RES)
 
     def pre_process(self, img, hp, input_res):
         center, scale = hp.center_scale()
@@ -52,12 +57,20 @@ class HPEstimationHMR(HPEstimationYolo):
         img = himage.data
 
         for i, hp in enumerate(hps):
+
+            start_time = time.time()
             norm_img, img_render = self.pre_process(img, hp, constants.IMG_RES)
+            print(f"Preprocessing : Inference time: {time.time() - start_time:.6f} seconds")
 
             with torch.no_grad():
+                start_time = time.time()
                 pred_rotmat, pred_betas, pred_camera = self.model(norm_img.cuda())
+                print(f"HMR : Inference time: {time.time() - start_time:.6f} seconds")
+                start_time = time.time()
                 pred_joints, pred_vertices = self.smpl(betas=pred_betas, body_pose=pred_rotmat[:,1:], global_orient=pred_rotmat[:,0].unsqueeze(1), pose2rot=False)
+                print(f"SMPL : Inference time: {time.time() - start_time:.6f} seconds")
 
+            start_time = time.time()
             # Render parametric shape
             # Calculate camera parameters for rendering
             camera_translation = torch.stack([pred_camera[:,1], pred_camera[:,2], 2*constants.FOCAL_LENGTH/(constants.IMG_RES * pred_camera[:,0] +1e-9)],dim=-1)
@@ -66,10 +79,22 @@ class HPEstimationHMR(HPEstimationYolo):
             pred_vertices = pred_vertices[0].cpu().numpy()
             img_render = img_render.permute(1,2,0).cpu().numpy()
             
-            if True:
+            img_shape = img_render
+
+            if self.render_mesh:
                 # Render non-parametric shape
-                img_shape = self.renderer(pred_vertices, camera_translation, img_render, pred_joints)
- 
+                verts_3d = pred_vertices + camera_translation
+                joints_3d = pred_joints + camera_translation
+                img_shape = self.renderer(verts_3d, [0, 0, 0], img_render, joints_3d)
+
+                # if img_rendered is not None:
+                img_shape = cv2.cvtColor(img_shape, cv2.COLOR_RGB2BGR)
+
+                cv2.imshow("smpl", img_shape)
+                cv2.waitKey(0)
+
+                # img_shape = self.renderer(pred_vertices, camera_translation, img_render, pred_joints)
+
             if False:
                 # Render side views
                 aroundy = cv2.Rodrigues(np.array([0, np.radians(90.), 0]))[0]
@@ -82,9 +107,10 @@ class HPEstimationHMR(HPEstimationYolo):
                 cv2.imwrite(outfile + '_shape_side' + str(i) +'.png', 255 * img_shape_side[:,:,::-1])
 
             joints2d = self.renderer.project_joints(pred_joints, camera_translation)
-
             joints2d = coords_to_bbox(joints2d, hp.xyxy(), constants.IMG_RES, constants.IMG_RES)
-            # dets.append(HPCoco(himage, joints2d, bbox=hp.bbox))
-            dets.append(HPSMPL(himage, joints2d, bbox=hp.bbox, img_rendered=img_shape))
+
+            print(f"Rendering : Inference time: {time.time() - start_time:.6f} seconds")
+
+            dets.append(HPSMPL(himage, joints2d, bbox=hp.bbox, img_rendered=img_shape, smpl_params = {'pose':pred_rotmat, 'cam':pred_camera, 'betas':pred_betas}))
 
         return dets
