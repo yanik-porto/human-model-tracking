@@ -4,8 +4,8 @@ from .HPEstimation import HPEstimation
 from HP.HP import HP
 
 class HPEstimationYolo(HPEstimation):
-    def __init__(self):
-        super(HPEstimationYolo, self).__init__()
+    def __init__(self, *args):
+        super(HPEstimationYolo, self).__init__(*args)
 
         self.model_det = YOLO("HPEstimation/YOLO/checkpoints/yolov8n.pt")
         self.score_min = 0.5
