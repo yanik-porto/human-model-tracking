@@ -9,7 +9,7 @@ class SMPL(_SMPL):
 
     def __init__(self, *args, **kwargs):
         super(SMPL, self).__init__(*args, **kwargs)
-        J_regressor_extra = np.load('HPEstimation/HMR/data/J_regressor_halpe.npy')
+        J_regressor_extra = np.load('HPEstimation/HMR/data/J_regressor_coco.npy')
         self.register_buffer('J_regressor_CONVENTION', torch.tensor(J_regressor_extra, dtype=torch.float32))
 
     def forward(self, *args, **kwargs):
