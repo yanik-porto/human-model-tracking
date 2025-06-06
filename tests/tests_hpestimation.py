@@ -13,8 +13,9 @@ from HPEstimation.HPEstimationYoloPose import HPEstimationYoloPose
 from HPEstimation.HPEstimationHMR import HPEstimationHMR
 from HP.utils import draw_keypoints, draw_bbox
 from SensorData.HImage import HImage
+from HPManager.Visualizer import Visualizer
 
-def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=False, save_bbox=False):
+def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=False, save_bbox=False, save_mesh=False):
     img = cv2.imread(imagePath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     himg = HImage(img, Path(imagePath))
@@ -33,6 +34,16 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
         imgOverlay = draw_bbox(img, dets[himg.viewpointId])
         imgOutPath = imagePath.replace(".jpg", "_bboxes_" + estimator.__class__.__name__ + ".jpg")
         imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(imgOutPath, imgOverlay)
+
+    if save_mesh:
+        class cfg:
+            def __init__(self):
+                self.estimator = 'hmr'
+                self.verbose = False
+        visu = Visualizer(cfg())
+        imgOverlay = visu.visualize_all([himg], dets)
+        imgOutPath = imagePath.replace(".jpg", "_meshes_" + estimator.__class__.__name__ + ".jpg")
         cv2.imwrite(imgOutPath, imgOverlay)
 
     inference_time = end_time - start_time
@@ -59,7 +70,7 @@ class TestHumanPoseEstimation(unittest.TestCase):
 
     def test_hmr(self):
         estimator = HPEstimationHMR()
-        dets = run_estimator(estimator, save_keypoints=True)
+        dets = run_estimator(estimator, save_keypoints=True, save_mesh=True)
 
 if __name__ == '__main__':
     unittest.main()
