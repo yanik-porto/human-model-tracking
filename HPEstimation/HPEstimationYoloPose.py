@@ -45,5 +45,5 @@ class HPEstimationYoloPose(HPEstimation):
                     print("idBox: ", idBox)
                 box[2] = box[2] - box[0]
                 box[3] = box[3] - box[1]
-                dets.append(HPCoco(himage, kpts, confKpts, box, trackid=trackid))
+                dets.append(HPCoco(himage, kpts, confKpts, box, trackid=trackid, detscore=conf))
         return dets
