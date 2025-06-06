@@ -1,9 +1,10 @@
 from HPEstimation.HPEstimationHMR import HPEstimationHMR
 from HPEstimation import HPEstimationFactory 
 from HPAction.HPActionUNIK import HPActionUNIK
-from HPTracker.HPTtracker import HPTracker
+from HPTracker.HPTracker import HPTracker
+from HPTracker.HPTrackerDS import HPTrackerDS
 from settings.utils import AverageMeter
-from HP.utils import draw_keypoints
+from .Visualizer import Visualizer
 
 import numpy as np
 import cv2
@@ -32,6 +33,7 @@ class HPManager:
         self.estim_time = AverageMeter()
         self.tracking_time = AverageMeter()
 
+        self.visualizer = Visualizer(self.config) if self.config.disp else None
 
     def process(self, himages):
         # 2D pose estimation
@@ -57,20 +59,7 @@ class HPManager:
             self.get_action()
 
         if self.config.disp:
-            for himg in himages:
-                viewId = himg.viewpointId
-                imgOverlay = himg.data
-                if viewId in hps:
-                    hpsImg = hps[viewId]
-                    if self.config.verbose:
-                        print("draw ", len(hpsImg), " skeletons")
-                    imgOverlay = draw_keypoints(imgOverlay, hpsImg)
-                imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
-                dispIm = cv2.resize(imgOverlay, (960, 540))
-                cv2.imshow(viewId, dispIm)
-
-                cv2.waitKey(1)
-
+            self.visualizer.visualize_all(himages, hps)
 
         if self.config.verbose:
             print("time estimation : {est_time.avg:.3f}\t".format(est_time=self.estim_time))
