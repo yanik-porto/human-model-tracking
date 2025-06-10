@@ -60,7 +60,8 @@ class HPEstimationHMR(HPEstimationYolo):
 
             start_time = time.time()
             norm_img, img_render = self.pre_process(img, hp, constants.IMG_RES)
-            print(f"Preprocessing : Inference time: {time.time() - start_time:.6f} seconds")
+            if self.verbose:
+                print(f"Preprocessing : Inference time: {time.time() - start_time:.6f} seconds")
 
             with torch.no_grad():
                 start_time = time.time()
