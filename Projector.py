@@ -1,6 +1,3 @@
-import HM.HM as HM
-from HM.HMSkeleton import HMSkeleton
-
 import cv2
 import numpy as np
 
