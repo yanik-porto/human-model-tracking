@@ -1,4 +1,4 @@
 smplx
 wheel
-chumpy # 0.72 from commit
+chumpy # 0.72 from commit (pip install git+https://github.com/mattloper/chumpy@9b045ff5d6588a24a0bab52c83f032e2ba433e17)
 # trimesh conda
