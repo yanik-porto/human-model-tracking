@@ -4,12 +4,8 @@ import cv2
 
 class HPSMPL(HPCoco):
     # def __init__(self, image, skeleton, vertices, camera_translation, bbox=None):
-    def __init__(self, image, skeleton, img_rendered, bbox=None, trackid=-1):
-        super(HPSMPL, self).__init__(image, skeleton, bbox=bbox, trackid=trackid)
+    def __init__(self, image, skeleton, img_rendered=None, bbox=None, trackid=-1, detscore=-1, smpl_params=None):
+        super(HPSMPL, self).__init__(image, skeleton, bbox=bbox, trackid=trackid, detscore=detscore)
 
         self.img_rendered = img_rendered
-
-        cv2.imshow("smpl", img_rendered)
-        cv2.waitKey(1000)
-        # self.vertices = vertices
-        # self.camera_translation = camera_translation
+        self.smpl_params = smpl_params
