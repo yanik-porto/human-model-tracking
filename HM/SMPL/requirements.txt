@@ -1,2 +1,4 @@
 smplx
-chumpy
+wheel
+chumpy # 0.72 from commit
+# trimesh conda
