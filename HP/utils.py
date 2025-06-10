@@ -46,7 +46,7 @@ def draw_keypoints(image, hpSkels, writeKptsName=False):
 
         # draw trackid
         if hpSkel.trackid != -1:
-            cv2.putText(imageOverlay, str(hpSkel.trackid), ((xyxy[2] + xyxy[0]) // 2, (xyxy[3] + xyxy[1])//2 ), cv2.FONT_HERSHEY_DUPLEX, 3, color, thickness=3)
+            cv2.putText(imageOverlay, str(hpSkel.trackid), ((xyxy[2] + xyxy[0]) // 4, (xyxy[3] + xyxy[1])//4 ), cv2.FONT_HERSHEY_DUPLEX, 2, color, thickness=2)
 
         if hpSkel.lastAction != action_default:
             cv2.putText(imageOverlay, hpSkel.lastAction, ((xyxy[2] + xyxy[0]) // 4, (xyxy[3] + xyxy[1])//4), cv2.FONT_HERSHEY_DUPLEX, 1, color, thickness=1)
