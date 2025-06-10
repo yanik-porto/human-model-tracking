@@ -1,6 +1,7 @@
 import cv2
 from random import seed
 from random import randint
+from HP.HP import action_default
 
 seed(1)
 
@@ -47,7 +48,8 @@ def draw_keypoints(image, hpSkels, writeKptsName=False):
         if hpSkel.trackid != -1:
             cv2.putText(imageOverlay, str(hpSkel.trackid), ((xyxy[2] + xyxy[0]) // 2, (xyxy[3] + xyxy[1])//2 ), cv2.FONT_HERSHEY_DUPLEX, 3, color, thickness=3)
 
-        cv2.putText(imageOverlay, hpSkel.lastAction, ((xyxy[2] + xyxy[0]) // 4, (xyxy[3] + xyxy[1])//4), cv2.FONT_HERSHEY_DUPLEX, 1, color, thickness=1)
+        if hpSkel.lastAction != action_default:
+            cv2.putText(imageOverlay, hpSkel.lastAction, ((xyxy[2] + xyxy[0]) // 4, (xyxy[3] + xyxy[1])//4), cv2.FONT_HERSHEY_DUPLEX, 1, color, thickness=1)
     return imageOverlay
 
 def intersection(a,b):

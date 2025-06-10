@@ -5,7 +5,6 @@ from pathlib import Path
 from Pipeline.pipeline import Pipeline
 from settings.config import load_config
 from SensorData.HImage import HImage
-from HP.utils import draw_keypoints
 
 def parse_args():
     parser = argparse.ArgumentParser("Read live stream and apply human tracking")
@@ -46,7 +45,7 @@ if __name__ == '__main__':
 
         frame = cv2.resize(frame, (640, 480))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        himg = HImage(frame, Path("/home/user/dummy"), idxframe)
+        himg = HImage(frame, Path("/home/user/Demo"), idxframe)
 
         images = []
         images.append(himg)
