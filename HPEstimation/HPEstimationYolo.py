@@ -7,7 +7,7 @@ class HPEstimationYolo(HPEstimation):
     def __init__(self, *args):
         super(HPEstimationYolo, self).__init__(*args)
 
-        self.model_det = YOLO("HPEstimation/YOLO/checkpoints/yolov8n.pt")
+        self.model_det = YOLO("HPEstimation/YOLO/checkpoints/yolov8l.pt")
         self.score_min = 0.1
         self.model_det.conf = self.score_min
 
