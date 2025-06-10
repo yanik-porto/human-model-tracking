@@ -8,7 +8,7 @@ class HPEstimationYolo(HPEstimation):
         super(HPEstimationYolo, self).__init__(*args)
 
         self.model_det = YOLO("HPEstimation/YOLO/checkpoints/yolov8n.pt")
-        self.score_min = 0.5
+        self.score_min = 0.1
         self.model_det.conf = self.score_min
 
     def process_image(self, himage):
