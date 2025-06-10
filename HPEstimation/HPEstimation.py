@@ -7,7 +7,7 @@ class HPEstimation(ABC):
     def __init__(self, verbose=False):
         self.minScoreKpt = 0.1
         self.nmsth = 0.5
-        self.keepOnlyOne = True
+        self.keepOnlyOne = False
         self.verbose = verbose
 
     def process(self, himages):
