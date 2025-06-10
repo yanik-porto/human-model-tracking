@@ -14,7 +14,7 @@ class HPEstimationYolo(HPEstimation):
     def process_image(self, himage):
 
         img = himage.data
-        preds = self.model_det.predict(img)
+        preds = self.model_det.predict(img, verbose=self.verbose)
         assert(len(preds) == 1)
 
         preds = preds[0].boxes

@@ -28,7 +28,7 @@ class HPTrackerDS(HPTracker):
 
         trackidxs = self.tracker.update(detections)
 
-        print(trackidxs)
+        # print(trackidxs)
 
         for idx, track_idx in enumerate(trackidxs):
             hp = hps[idx]

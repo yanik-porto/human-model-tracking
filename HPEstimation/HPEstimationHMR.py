@@ -65,10 +65,12 @@ class HPEstimationHMR(HPEstimationYolo):
             with torch.no_grad():
                 start_time = time.time()
                 pred_rotmat, pred_betas, pred_camera = self.model(norm_img.cuda())
-                print(f"HMR : Inference time: {time.time() - start_time:.6f} seconds")
+                if self.verbose:
+                    print(f"HMR : Inference time: {time.time() - start_time:.6f} seconds")
                 start_time = time.time()
                 pred_joints, pred_vertices = self.smpl(betas=pred_betas, body_pose=pred_rotmat[:,1:], global_orient=pred_rotmat[:,0].unsqueeze(1), pose2rot=False)
-                print(f"SMPL : Inference time: {time.time() - start_time:.6f} seconds")
+                if self.verbose:
+                    print(f"SMPL : Inference time: {time.time() - start_time:.6f} seconds")
 
             start_time = time.time()
             # Render parametric shape
@@ -109,7 +111,8 @@ class HPEstimationHMR(HPEstimationYolo):
             joints2d = self.renderer.project_joints(pred_joints, camera_translation)
             joints2d = coords_to_bbox(joints2d, hp.xyxy(), constants.IMG_RES, constants.IMG_RES)
 
-            print(f"Rendering : Inference time: {time.time() - start_time:.6f} seconds")
+            if self.verbose:
+                print(f"Rendering : Inference time: {time.time() - start_time:.6f} seconds")
 
             dets.append(HPSMPL(himage, joints2d, bbox=hp.bbox, img_rendered=img_shape, smpl_params = {'pose':pred_rotmat, 'cam':pred_camera, 'betas':pred_betas}))
 
