@@ -5,6 +5,7 @@ from HPTracker.HPTracker import HPTracker
 from HPTracker.HPTrackerDS import HPTrackerDS
 from settings.utils import AverageMeter
 from .Visualizer import Visualizer
+from .SMPL2VERTS import SMPL2VERTS
 
 import numpy as np
 import cv2
@@ -33,7 +34,8 @@ class HPManager:
         self.estim_time = AverageMeter()
         self.tracking_time = AverageMeter()
 
-        self.visualizer = Visualizer(self.config) if self.config.disp else None
+        self.smpl2verts = SMPL2VERTS(load_rest=True) if self.config.estimator == "hmr" else None
+        self.visualizer = Visualizer(self.config, self.smpl2verts) if self.config.disp else None
 
     def process(self, himages):
         # 2D pose estimation
