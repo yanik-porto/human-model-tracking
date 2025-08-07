@@ -2,25 +2,23 @@ import numpy as np
 import cv2
 import torch
 
-from tools.renderer import Renderer
+# from tools.renderer import Renderer
+from tools.rendering.tools.renderer import Renderer
 from HP.utils import draw_keypoints
 from HM.SMPL.smpl import SMPL
 from HM.SMPL import constants
 from preprocessing.utils import crop
 
 class Visualizer:
-    def __init__(self, cfg):
+    def __init__(self, cfg, smpl2verts=None):
         self.config = cfg
         self.renderer = None
         self.up_scale = 1
         if cfg.estimator == 'hmr':
             faces = np.load('HPEstimation/HMR/models/smpl/faces.npy')
-            self.renderer = Renderer(focal_length = constants.FOCAL_LENGTH, img_res=constants.IMG_RES * self.up_scale, faces=faces) #, img_res_height=constants.IMG_RES)
-            # Load SMPL model
-            self.smpl = SMPL('HPEstimation/HMR/models/smpl/SMPL_NEUTRAL.pkl',
-                        batch_size=1,
-                        create_transl=False).cuda()
-            
+            # self.renderer = Renderer(focal_length = constants.FOCAL_LENGTH, img_res=constants.IMG_RES * self.up_scale, faces=faces) #, img_res_height=constants.IMG_RES)
+            self.renderer = Renderer(focal_length_mm = constants.FOCAL_LENGTH, img_res=constants.IMG_RES * self.up_scale, faces=faces, sensor_width=constants.IMG_RES * self.up_scale) #, img_res_height=constants.IMG_RES)
+            self.smpl2verts = smpl2verts
 
     def visualize_all(self, himages, hps):
         for himg in himages:
@@ -42,7 +40,7 @@ class Visualizer:
                     imgPath = os.path.splitext(himg.srcPath)[0] + "_" + str(himg.idx) + ".jpg"
                     cv2.imwrite(imgPath, dispIm)
 
-            cv2.waitKey(1)
+            cv2.waitKey(0)
         return imgOverlay
 
     def draw_mesh(self, image, hpMeshs):
@@ -52,32 +50,14 @@ class Visualizer:
 
 
         for hpMesh in hpMeshs:
-            smpl_params = hpMesh.smpl_params
-            betas = smpl_params['betas']
-            pose = smpl_params['pose']
-            camera = smpl_params['cam']
-            joints_3d, vertices_3d = self.smpl(betas=betas, body_pose=pose[:,1:], global_orient=pose[:,0].unsqueeze(1), pose2rot=False)
-
-            # Calculate camera parameters for rendering
-            camera_translation = torch.stack([camera[:,1], camera[:,2], 2*constants.FOCAL_LENGTH/(constants.IMG_RES * camera[:,0] +1e-9)],dim=-1)
-            camera_translation = camera_translation[0].cpu().numpy()
-            pred_joints = joints_3d[0].cpu().numpy()
-            vertices_3d = vertices_3d[0].cpu().numpy()
-            # img_render = img_render.permute(1,2,0).cpu().numpy()
-
             # crop the same way it is done in HPEstimationHMR
             center, scale = hpMesh.center_scale()
             img_local = crop(imageOverlay, center, scale, (constants.IMG_RES * self.up_scale, constants.IMG_RES * self.up_scale))
             img_local = img_local.astype(np.float32) / 255
 
-            # adapt cam translation to upscale 
-            camera_translation[2] /= self.up_scale
-
-            # add cam translation to vertices location (could be passed to renderer instead)
-            vertices_3d += camera_translation
-
             # renderer
-            img_local = self.renderer(vertices_3d, [0, 0, 0], img_local)
+            vertices_3d = self.smpl2verts(hpMesh, self.up_scale)
+            img_local = self.renderer(vertices_3d, [0, 0, 0], image=img_local)
 
             # find crop location inside original image 
             xyxy = hpMesh.xyxy()
