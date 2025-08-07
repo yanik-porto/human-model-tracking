@@ -14,6 +14,7 @@ from HPEstimation.HPEstimationHMR import HPEstimationHMR
 from HP.utils import draw_keypoints, draw_bbox
 from SensorData.HImage import HImage
 from HPManager.Visualizer import Visualizer
+from HPManager.SMPL2VERTS import SMPL2VERTS
 
 def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=False, save_bbox=False, save_mesh=False):
     img = cv2.imread(imagePath)
@@ -41,7 +42,8 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
             def __init__(self):
                 self.estimator = 'hmr'
                 self.verbose = False
-        visu = Visualizer(cfg())
+        smpl2verts = SMPL2VERTS(load_rest=False) 
+        visu = Visualizer(cfg(), smpl2verts)
         imgOverlay = visu.visualize_all([himg], dets)
         imgOutPath = imagePath.replace(".jpg", "_meshes_" + estimator.__class__.__name__ + ".jpg")
         cv2.imwrite(imgOutPath, imgOverlay)
