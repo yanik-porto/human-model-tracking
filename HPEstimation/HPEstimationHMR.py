@@ -4,8 +4,8 @@ from HM.SMPL.smpl import SMPL
 from HM.SMPL import constants
 from HP.HPSMPL import HPSMPL
 from preprocessing.utils import crop
-from tools.renderer import Renderer
-from tools.scene3d import Scene3D
+from tools.rendering.tools.renderer import Renderer
+from tools.rendering.tools.scene3d import Scene3D
 from HPEstimation.utils import coords_to_bbox
 
 import numpy as np
@@ -32,9 +32,9 @@ class HPEstimationHMR(HPEstimationYolo):
 
         self.render_mesh = False
         if self.render_mesh:
-            self.renderer = Renderer(focal_length=constants.FOCAL_LENGTH, img_res=constants.IMG_RES, faces=self.smpl.faces)
+            self.renderer = Renderer(focal_length_mm=constants.FOCAL_LENGTH, img_res=constants.IMG_RES, faces=self.smpl.faces, sensor_width=constants.IMG_RES)
         else:
-            self.renderer = Scene3D(focal_length=constants.FOCAL_LENGTH, img_res=constants.IMG_RES)
+            self.renderer = Scene3D(focal_length_mm=constants.FOCAL_LENGTH, img_res=constants.IMG_RES, sensor_width=constants.IMG_RES)
 
     def pre_process(self, img, hp, input_res):
         center, scale = hp.center_scale()
@@ -88,15 +88,13 @@ class HPEstimationHMR(HPEstimationYolo):
                 # Render non-parametric shape
                 verts_3d = pred_vertices + camera_translation
                 joints_3d = pred_joints + camera_translation
-                img_shape = self.renderer(verts_3d, [0, 0, 0], img_render, joints_3d)
+                img_shape = self.renderer(verts_3d, [0, 0, 0], image=img_render, joints=joints_3d, from_left_hand=True)
 
                 # if img_rendered is not None:
                 img_shape = cv2.cvtColor(img_shape, cv2.COLOR_RGB2BGR)
 
                 cv2.imshow("smpl", img_shape)
                 cv2.waitKey(0)
-
-                # img_shape = self.renderer(pred_vertices, camera_translation, img_render, pred_joints)
 
             if False:
                 # Render side views
