@@ -1,0 +1,3 @@
+[submodule "tools/rendering"]
+	path = tools/rendering
+	url = git@github.com:yanik-porto/babel-mv.git
