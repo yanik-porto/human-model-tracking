@@ -10,6 +10,7 @@ class Config():
         self.verbose = False
         self.estimate_action = False
         # self.save_projections = True
+        self.keep_only_one = False
 
 def load_config():
     config = Config()
