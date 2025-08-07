@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import torch
 
-# from tools.renderer import Renderer
 from tools.rendering.tools.renderer import Renderer
 from HP.utils import draw_keypoints
 from HM.SMPL.smpl import SMPL
@@ -16,7 +15,6 @@ class Visualizer:
         self.up_scale = 1
         if cfg.estimator == 'hmr':
             faces = np.load('HPEstimation/HMR/models/smpl/faces.npy')
-            # self.renderer = Renderer(focal_length = constants.FOCAL_LENGTH, img_res=constants.IMG_RES * self.up_scale, faces=faces) #, img_res_height=constants.IMG_RES)
             self.renderer = Renderer(focal_length_mm = constants.FOCAL_LENGTH, img_res=constants.IMG_RES * self.up_scale, faces=faces, sensor_width=constants.IMG_RES * self.up_scale) #, img_res_height=constants.IMG_RES)
             self.smpl2verts = smpl2verts
 
@@ -56,8 +54,11 @@ class Visualizer:
             img_local = img_local.astype(np.float32) / 255
 
             # renderer
-            vertices_3d = self.smpl2verts(hpMesh, self.up_scale)
-            img_local = self.renderer(vertices_3d, [0, 0, 0], image=img_local)
+            vertices_3d, camera = self.smpl2verts(hpMesh)#, self.up_scale)
+            camera_translation = torch.stack([camera[:,1], camera[:,2], 2*constants.FOCAL_LENGTH/(constants.IMG_RES * camera[:,0] +1e-9)],dim=-1)[0].cpu().numpy()
+            camera_translation[2] /= self.up_scale  # adapt cam translation to upscale 
+            img_local = self.renderer(vertices_3d, camera_translation, image=img_local, from_left_hand=True)
+
 
             # find crop location inside original image 
             xyxy = hpMesh.xyxy()

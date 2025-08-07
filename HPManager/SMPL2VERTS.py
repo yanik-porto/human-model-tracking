@@ -20,9 +20,8 @@ class SMPL2VERTS():
             _, rest_vertices = self.smpl(betas=betas_rest, body_pose=body_pose, global_orient=global_orient, pose2rot=True)
             self.rest_vertices = rest_vertices[0].cpu().numpy()
 
-    def apply_translation(self, vertices_3d, camera, up_scale=1, apply_camera_params=True):
+    def apply_translation(self, vertices_3d, camera, up_scale=1, apply_camera_params=False):
             # Calculate camera parameters for rendering
-            # camera_translation = torch.stack([camera[:,1], camera[:,2], 1/camera[:,0]] ,dim=-1)
             camera_translation = torch.stack([-camera[:,1], camera[:,2], 1/camera[:,0]] ,dim=-1)
             if apply_camera_params:
                 camera_translation = torch.stack([camera[:,1], camera[:,2], 2*constants.FOCAL_LENGTH/(constants.IMG_RES * camera[:,0] +1e-9)],dim=-1)
@@ -42,19 +41,11 @@ class SMPL2VERTS():
             pred_joints = joints_3d[0].cpu().numpy()
             vertices_3d = vertices_3d[0].cpu().numpy()
 
+            return vertices_3d, camera
+
             return self.apply_translation(vertices_3d, camera, up_scale, apply_camera_params)
     
-            # Calculate camera parameters for rendering
-            camera_translation = torch.stack([-camera[:,1], camera[:,2], 1/camera[:,0]] ,dim=-1)
-            if apply_camera_params:
-                camera_translation = torch.stack([camera[:,1], camera[:,2], 2*constants.FOCAL_LENGTH/(constants.IMG_RES * camera[:,0] +1e-9)],dim=-1)
-            camera_translation = camera_translation[0].cpu().numpy()
-            camera_translation[2] /= up_scale  # adapt cam translation to upscale 
-            vertices_3d += camera_translation # add cam translation to vertices location (could be passed to renderer instead)
-
-            return vertices_3d
-    
-    def get_rest_with_trans(self, hpMesh, up_scale=1, apply_camera_params=True):
+    def get_rest_with_trans(self, hpMesh, up_scale=1, apply_camera_params=False):
             smpl_params = hpMesh.smpl_params
             camera = smpl_params['cam']
 
