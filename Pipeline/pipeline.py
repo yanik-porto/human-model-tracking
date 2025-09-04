@@ -1,7 +1,7 @@
 from HPManager.HPManager import HPManager
 from Projector import Projector
 from pathlib import Path
-
+from HP.HPSMPL import HPSMPL
 
 class Pipeline():
     def __init__(self, config):
@@ -13,6 +13,7 @@ class Pipeline():
         # world management
         self.projector = Projector()
         self.skels3d = []
+
 
     def set_viewpoints(self, metaByVpath):
         self.metaByVid = {}
@@ -57,3 +58,32 @@ class Pipeline():
         for track in tracklets.values():
             hps.append(track[-1])
         return hps
+    
+    def last_hms(self):
+        # For now the model from the first projection
+        hms = []
+        if len(self.hp_manager.trackers) == 0:
+            return hms
+        
+        firstview = next(iter(self.hp_manager.trackers))
+        tracklets = self.hp_manager.trackers[firstview].tracklets
+        for track in tracklets.values():
+            last_hm = track[-1]
+            if type(last_hm) is HPSMPL:
+                hms.append(last_hm)
+        return hms
+    
+    def last_hms_verts(self, rest_pose=False):
+        vertices_3d = []
+        trackids = []
+        hms = self.last_hms()
+        for hm in hms:
+            if rest_pose:
+                verts = self.hp_manager.smpl2verts.get_rest_with_trans(hm, apply_camera_params=False)
+            else:
+                verts, camera = self.hp_manager.smpl2verts(hm, apply_camera_params=False, rotate_to_right_hand=True)
+                verts = self.hp_manager.smpl2verts.apply_translation(verts, camera)
+
+            vertices_3d.append(verts.tolist())
+            trackids.append(hm.trackid)
+        return vertices_3d, trackids
