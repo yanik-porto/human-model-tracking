@@ -1,3 +1,6 @@
 [submodule "tools/rendering"]
 	path = tools/rendering
 	url = git@github.com:yanik-porto/babel-mv.git
+[submodule "tracked-meshes-viewer"]
+	path = tracked-meshes-viewer
+	url = git@github.com:yanik-porto/tracked-meshes-viewer.git
