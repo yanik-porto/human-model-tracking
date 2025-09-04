@@ -3,6 +3,7 @@ from HM.SMPL import constants
 
 import torch
 import numpy as np
+from tools.rendering.tools.matrix import rotation_3d_x
 
 class SMPL2VERTS():
     def __init__(self, load_rest=False):
@@ -31,7 +32,7 @@ class SMPL2VERTS():
 
             return vertices_3d
 
-    def __call__(self, hpMesh, up_scale=1, apply_camera_params=True):
+    def __call__(self, hpMesh, up_scale=1, apply_camera_params=True, rotate_to_right_hand=False):
             smpl_params = hpMesh.smpl_params
             betas = smpl_params['betas']
             pose = smpl_params['pose']
@@ -40,6 +41,12 @@ class SMPL2VERTS():
 
             pred_joints = joints_3d[0].cpu().numpy()
             vertices_3d = vertices_3d[0].cpu().numpy()
+
+            if rotate_to_right_hand:
+                rot = rotation_3d_x(np.radians(180))
+                jHomo = np.concatenate((vertices_3d, np.ones((vertices_3d.shape[0], 1))), axis=1).transpose()
+                jRotated = rot @ jHomo
+                vertices_3d = jRotated.transpose()[:, :3]
 
             return vertices_3d, camera
 
