@@ -45,12 +45,18 @@ def run_pipeline(folder_path, config, use_tqdm=True, plugin="FFMPEG"):
     for idx in indexes:
         images = []
         for vidpath in metaByVpath:
+
             if idx < metaByVpath[vidpath]['maxIdx']:
                 try:
                     st = time.time()
                     img = iio.imread(vidpath, index=idx, plugin=plugin)
                     loading_time.update(time.time() - st)
-                    images.append(HImage(img, Path(vidpath), idx))
+
+                    if 'bboxs' in metaByVpath[vidpath] and metaByVpath[vidpath]['bboxs'].shape[0] > idx:
+                        bbox = metaByVpath[vidpath]['bboxs'][idx]
+                    else:
+                        bbox = None
+                    images.append(HImage(img, Path(vidpath), idx, bbox=bbox))
                 except Exception as e:
                     print("failed reading image from ", vidpath, " at index #", idx)
                     print(e)

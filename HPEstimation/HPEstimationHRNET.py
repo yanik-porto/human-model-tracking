@@ -11,8 +11,8 @@ from albumentations.pytorch.transforms import ToTensorV2
 from yacs.config import CfgNode as CN
 
 class HPEstimationHRNET(HPEstimation):
-    def __init__(self, *args):
-        super(HPEstimationHRNET, self).__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super(HPEstimationHRNET, self).__init__(*args, **kwargs)
 
         self.minScoreKpt = 0.01
 
@@ -93,6 +93,17 @@ class HPEstimationHRNET(HPEstimation):
     
     def process_image(self, himage):
         image = himage.data
+        bbox = None
+        if himage.bbox is not None and himage.bbox[2] > 10 and himage.bbox[3] > 10: # check if bbox not empty
+            bbox = himage.bbox
+            ratio = bbox[2] / bbox[3]
+            if ratio < 1.3:
+                # make it wider
+                neww = int(bbox[3] * 1.3)
+                diff = neww - bbox[2]
+                bbox = (max(0, bbox[0]-diff//2), bbox[1], neww, bbox[3])
+            image = image[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2], :]
+
         base_size, center, scale = get_multi_scale_size(
             image, self.cfg.DATASET.INPUT_SIZE, 1.0, min(self.cfg.TEST.SCALE_FACTOR)
         )
@@ -114,6 +125,15 @@ class HPEstimationHRNET(HPEstimation):
                 grouped, center, scale,
                 [final_heatmaps.size(3), final_heatmaps.size(2)]
             )
+        
+        if bbox is not None:
+            # we need to re-adjust the keypoints
+            for i in range(len(final_results)):
+                for j in range(final_results[i].shape[0]):
+                    if final_results[i][j, 0] > 0: # move only if keypoint detected
+                        final_results[i][j, 0] = final_results[i][j, 0] + bbox[0]
+                    if final_results[i][j, 1] > 1: # move only if keypoint detected
+                        final_results[i][j, 1] = final_results[i][j, 1] + bbox[1]
         
         dets = []
         for iS, skel in enumerate(final_results):

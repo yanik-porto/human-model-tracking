@@ -2,7 +2,7 @@ action_default = "unknown"
 
 class HP:
     def __init__(self, image, bbox, trackid=-1, detscore=-1.):
-        self.image = image
+        self.image = image # TODO : keep only image meta data instead of full image 
         # bbox : left top width height
         self.bbox = bbox
         self.viewpointId = self.image.viewpointId
