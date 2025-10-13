@@ -48,8 +48,9 @@ def run_pipeline(pipeline, metaByVpath, maxIdxAll, config, use_tqdm=True, plugin
 
         pipeline.process(images)
 
-    print("time loading : {est_time.avg:.3f}\t".format(est_time=loading_time))
-    pipeline.print_stats()
+    if config.verbose:
+        print("time loading : {est_time.avg:.3f}\t".format(est_time=loading_time))
+        pipeline.print_stats()
 
     
 def run_pipeline_on_folder(folder_path, config, use_tqdm=True, plugin="FFMPEG"):

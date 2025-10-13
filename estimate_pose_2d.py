@@ -2,6 +2,7 @@ import argparse
 import os
 import glob
 import concurrent.futures
+import time
 
 from settings.config import load_config
 from Pipeline.runner_folder import run_pipeline_on_folder, run_pipeline_on_file
@@ -56,6 +57,9 @@ if __name__ == "__main__":
                         continue 
                 paths.append(folder_path)
 
+    print(f"{len(paths)} folders to process")
+
+    st = time.perf_counter()
     if args.num_workers == 1:
         for path in paths:
             run_pipeline_and_save_projections(path, config, use_tqdm=True, by_file=args.by_file)
@@ -65,3 +69,4 @@ if __name__ == "__main__":
             for future in concurrent.futures.as_completed(futur_to_path):
                 path = futur_to_path[future]
                 print(path, " completed successfully")
+    print("time total : ", (time.perf_counter() - st) / 60.,  " min")
