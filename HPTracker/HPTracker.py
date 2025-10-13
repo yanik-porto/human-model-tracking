@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 class HPTracker:
-    def __init__(self, trackerid=""):
+    def __init__(self, trackerid="", keep_only_one=False):
         self.trackerid = trackerid
         self.tracklets = {}
         self.ids_manager = IdsManager(100)
@@ -16,14 +16,18 @@ class HPTracker:
         # add an empty detection if not found in an image
         self.emptyIfNotFound = True
         self.retrieveNotFoundLaterOn = True
+        self.keep_only_one = keep_only_one
 
     def process(self, hps):
         for hp in hps:
             if hp.trackid == -1:
-                matchid = self.match_prev(hp)
-                if matchid == -1:
-                    matchid = self.ids_manager.get_new_id()
-                    self.tracklets[matchid] = []
+                if self.keep_only_one and len(self.tracklets) > 0:
+                    matchid = list(self.tracklets.keys())[0]
+                else:
+                    matchid = self.match_prev(hp)
+                    if matchid == -1:
+                        matchid = self.ids_manager.get_new_id()
+                        self.tracklets[matchid] = []
                 hp.trackid = matchid
             if not hp.trackid in self.tracklets:
                 self.tracklets[hp.trackid] = []
@@ -62,9 +66,18 @@ class HPTracker:
 
             keypoints = []
             keypoints_score = []
+            skelshape = np.asarray(hps[0].skeleton).shape
+            confshape = np.asarray(hps[0].confidences).shape
+            idx = 0
             for hp in hps:
+                while idx < hp.image.idx:
+                    # add empty skeleton for missing frames
+                    keypoints.append(np.zeros(skelshape, np.float32))
+                    keypoints_score.append(np.zeros(confshape, np.float32))
+                    idx += 1
                 keypoints.append(hp.skeleton)
                 keypoints_score.append(hp.confidences)
+                idx += 1
             
             keypoints = np.asarray(keypoints, dtype=np.float32)
             keypoints_score = np.asarray(keypoints_score, dtype=np.float32)
