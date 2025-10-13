@@ -51,7 +51,7 @@ class HPManager:
         st = time.time()
         for himg in himages:
             if himg.viewpointId not in self.trackers:
-                self.trackers[himg.viewpointId] = HPTracker(himg.viewpointId)
+                self.trackers[himg.viewpointId] = HPTracker(himg.viewpointId, self.config.keep_only_one)
             if himg.viewpointId in hps:
                 self.trackers[himg.viewpointId].process(hps[himg.viewpointId])
         self.tracking_time.update(time.time() - st)
@@ -72,7 +72,7 @@ class HPManager:
             hpsToProcess = []
             for hp in hpsImg:
                 if len(hp.confidences) > 0:
-                    goodJoints = np.sum(np.array(hp.confidences) > self.estimator.minScoreKpt) 
+                    goodJoints = np.sum(np.array(hp.confidences) > self.estimator.minScoreKpt)
                     ratio = goodJoints / len(hp.confidences)
                     print("ratio: ", ratio)
                     if ratio > 0.7:
