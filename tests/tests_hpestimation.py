@@ -25,15 +25,16 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
     end_time = time.time()
     print(len(dets), " skeleton detected")
 
+    _, ext = os.path.splitext(imagePath)
     if save_keypoints:
         imgOverlay = draw_keypoints(img, dets[himg.viewpointId])
-        imgOutPath = imagePath.replace(".jpg", "_kpts_" + estimator.__class__.__name__ + ".jpg")
+        imgOutPath = imagePath.replace(ext, "_kpts_" + estimator.__class__.__name__ + ext)
         imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
         cv2.imwrite(imgOutPath, imgOverlay)
 
     if save_bbox:
         imgOverlay = draw_bbox(img, dets[himg.viewpointId])
-        imgOutPath = imagePath.replace(".jpg", "_bboxes_" + estimator.__class__.__name__ + ".jpg")
+        imgOutPath = imagePath.replace(ext, "_bboxes_" + estimator.__class__.__name__ + ext)
         imgOverlay = cv2.cvtColor(imgOverlay, cv2.COLOR_RGB2BGR)
         cv2.imwrite(imgOutPath, imgOverlay)
 
@@ -45,7 +46,7 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
         smpl2verts = SMPL2VERTS(load_rest=False) 
         visu = Visualizer(cfg(), smpl2verts)
         imgOverlay = visu.visualize_all([himg], dets)
-        imgOutPath = imagePath.replace(".jpg", "_meshes_" + estimator.__class__.__name__ + ".jpg")
+        imgOutPath = imagePath.replace(ext, "_meshes_" + estimator.__class__.__name__ + ext)
         cv2.imwrite(imgOutPath, imgOverlay)
 
     inference_time = end_time - start_time
@@ -55,7 +56,7 @@ def run_estimator(estimator, imagePath="tests/000000000785.jpg", save_keypoints=
 
 class TestHumanPoseEstimation(unittest.TestCase):
     def test_hrnet(self):
-        estimator = HPEstimationHRNET()
+        estimator = HPEstimationHRNET(keepOnlyOne=True)
         dets = run_estimator(estimator, save_keypoints=True)
 
     def test_alpha_pose(self):
